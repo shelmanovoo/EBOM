@@ -1,0 +1,361 @@
+-- =============================================
+-- Создание деталей для узла "Корпус" (Assembly 1)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 7 деталей для сборочного узла "Корпус"
+-- и связывает их иерархическими связями CONTAINS
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Корпус"
+MATCH (korpus:Assembly {number: '1', name: 'Корпус'})
+WITH count(korpus) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Корпус" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ КОРПУСА (2-8)
+-- =============================================
+
+// Находим родительский узел "Корпус"
+MATCH (korpus:Assembly {number: '1', name: 'Корпус'})
+
+// 2. Корпус левый
+CREATE (p2:Part {
+    number: '2',
+    name: 'Корпус левый',
+    description: 'Левая половинка корпуса шарового крана',
+    function: 'Формирование рабочей камеры, установка седла',
+    material_spec: 'Сталь литая 25Л',
+    weight_kg: 4.2,
+    dimensions: 'DN50 x PN16',
+    surface_treatment: 'Покрытие антикоррозионное',
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'BASIC_PART',
+    drawing_number: 'КК-02-001',
+    standard: 'ГОСТ 33259-2015'
+})
+
+// 3. Корпус правый
+CREATE (p3:Part {
+    number: '3',
+    name: 'Корпус правый',
+    description: 'Правая половинка корпуса шарового крана',
+    function: 'Формирование рабочей камеры, установка седла',
+    material_spec: 'Сталь литая 25Л',
+    weight_kg: 4.0,
+    dimensions: 'DN50 x PN16',
+    surface_treatment: 'Покрытие антикоррозионное',
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'BASIC_PART',
+    drawing_number: 'КК-02-002',
+    standard: 'ГОСТ 33259-2015'
+})
+
+// 4. Прокладка межкорпусная
+CREATE (p4:Part {
+    number: '4',
+    name: 'Прокладка межкорпусная',
+    description: 'Уплотнительная прокладка между половинками корпуса',
+    function: 'Герметизация стыка корпусных половинок',
+    material_spec: 'Паронит ПОН-Б',
+    thickness_mm: 1.5,
+    inner_diameter_mm: 62,
+    outer_diameter_mm: 145,
+    temperature_range: '-50...+450 °C',
+    pressure_max: 'PN25',
+    created: datetime(),
+    status: 'CONSUMABLE',
+    category: 'GASKET',
+    drawing_number: 'КК-02-003',
+    standard: 'ГОСТ 15180-86'
+})
+
+// 5. Болт стяжной корпуса
+CREATE (p5:Part {
+    number: '5',
+    name: 'Болт стяжной корпуса',
+    description: 'Болт для стяжки корпусных половинок',
+    function: 'Создание усилия сжатия корпусных половинок',
+    material_spec: 'Сталь 40Х',
+    diameter: 'М16',
+    length_mm: 120,
+    thread: 'М16-6g',
+    strength_class: '8.8',
+    quantity_per_unit: 4,
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'FASTENER',
+    drawing_number: 'КК-02-004',
+    standard: 'ГОСТ 7798-70'
+})
+
+// 6. Гайка стяжная корпуса
+CREATE (p6:Part {
+    number: '6',
+    name: 'Гайка стяжная корпуса',
+    description: 'Гайка для стяжных болтов корпуса',
+    function: 'Фиксация болтов стяжных',
+    material_spec: 'Сталь 35',
+    thread: 'М16-6Н',
+    height_mm: 13,
+    width_across_flats_mm: 24,
+    strength_class: '8',
+    quantity_per_unit: 4,
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'FASTENER',
+    drawing_number: 'КК-02-005',
+    standard: 'ГОСТ 5915-70'
+})
+
+// 7. Шайба плоская
+CREATE (p7:Part {
+    number: '7',
+    name: 'Шайба плоская',
+    description: 'Плоская шайба под гайку',
+    function: 'Распределение нагрузки, защита поверхности',
+    material_spec: 'Сталь 65Г',
+    inner_diameter_mm: 17,
+    outer_diameter_mm: 30,
+    thickness_mm: 3,
+    hardness: 'HRC 40-48',
+    quantity_per_unit: 4,
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'WASHER',
+    drawing_number: 'КК-02-006',
+    standard: 'ГОСТ 11371-78'
+})
+
+// 8. Шайба пружинная
+CREATE (p8:Part {
+    number: '8',
+    name: 'Шайба пружинная',
+    description: 'Пружинная шайба (гровер)',
+    function: 'Стопорение гайки, предотвращение самоотвинчивания',
+    material_spec: 'Сталь 65Г',
+    nominal_size: '16',
+    outer_diameter_mm: 24,
+    thickness_mm: 4,
+    hardness: 'HRC 42-50',
+    quantity_per_unit: 4,
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'LOCK_WASHER',
+    drawing_number: 'КК-02-007',
+    standard: 'ГОСТ 6402-70'
+})
+
+RETURN '✓ Создано 7 деталей корпуса (номера 2-8)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Корпус"
+WITH korpus
+MATCH (p2:Part {number: '2'})
+MATCH (p3:Part {number: '3'})
+MATCH (p4:Part {number: '4'})
+MATCH (p5:Part {number: '5'})
+MATCH (p6:Part {number: '6'})
+MATCH (p7:Part {number: '7'})
+MATCH (p8:Part {number: '8'})
+
+// Создаем связи с атрибутами
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    mounting_direction: 'ОСНОВНАЯ',
+    created: datetime()
+}]->(p2)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    mounting_direction: 'ОСНОВНАЯ',
+    created: datetime()
+}]->(p3)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-003',
+    sequence: 3,
+    quantity: 1,
+    unit: 'шт',
+    mounting_direction: 'МЕЖДУ КОРПУСАМИ',
+    created: datetime()
+}]->(p4)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-004',
+    sequence: 4,
+    quantity: 4,
+    unit: 'шт',
+    mounting_direction: 'ВЕРТИКАЛЬНО',
+    created: datetime()
+}]->(p5)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-005',
+    sequence: 5,
+    quantity: 4,
+    unit: 'шт',
+    mounting_direction: 'ВЕРТИКАЛЬНО',
+    created: datetime()
+}]->(p6)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-006',
+    sequence: 6,
+    quantity: 4,
+    unit: 'шт',
+    mounting_direction: 'ПОД ГАЙКУ',
+    created: datetime()
+}]->(p7)
+
+CREATE (korpus)-[:CONTAINS {
+    relationship_id: 'CORPUS-007',
+    sequence: 7,
+    quantity: 4,
+    unit: 'шт',
+    mounting_direction: 'ПОД ГАЙКУ',
+    created: datetime()
+}]->(p8)
+
+RETURN '✓ Создано 7 иерархических связей' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ ДОПОЛНИТЕЛЬНЫХ СВЯЗЕЙ МЕЖДУ ДЕТАЛЯМИ
+-- =============================================
+
+// Связи между взаимосвязанными деталями (опционально)
+MATCH (bolt:Part {number: '5'})
+MATCH (nut:Part {number: '6'})
+MATCH (washer_flat:Part {number: '7'})
+MATCH (washer_spring:Part {number: '8'})
+
+// Болт используется с гайкой
+CREATE (bolt)-[:USED_WITH {
+    relationship_type: 'FASTENER_ASSEMBLY',
+    assembly_sequence: 1,
+    torque_nm: 120,
+    created: datetime()
+}]->(nut)
+
+// Гайка используется с плоской шайбой
+CREATE (nut)-[:USED_WITH {
+    relationship_type: 'FASTENER_ASSEMBLY',
+    assembly_sequence: 2,
+    created: datetime()
+}]->(washer_flat)
+
+// Гайка используется с пружинной шайбой
+CREATE (nut)-[:USED_WITH {
+    relationship_type: 'FASTENER_ASSEMBLY',
+    assembly_sequence: 3,
+    created: datetime()
+}]->(washer_spring)
+
+RETURN '✓ Созданы связи между крепежными деталями' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ ИНДЕКСОВ И ОГРАНИЧЕНИЙ
+-- =============================================
+
+// Создаем индексы для быстрого поиска деталей
+CREATE INDEX part_number IF NOT EXISTS FOR (p:Part) ON (p.number);
+CREATE INDEX part_name IF NOT EXISTS FOR (p:Part) ON (p.name);
+CREATE INDEX part_category IF NOT EXISTS FOR (p:Part) ON (p.category);
+
+// Создаем ограничение уникальности номера детали
+CREATE CONSTRAINT unique_part_number IF NOT EXISTS 
+FOR (p:Part) REQUIRE p.number IS UNIQUE;
+
+RETURN '✓ Созданы индексы и ограничения для деталей' AS Статус;
+
+-- =============================================
+-- 5. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем количество созданных деталей в узле "Корпус"
+MATCH (korpus:Assembly {number: '1'})-[:CONTAINS]->(part:Part)
+WITH korpus, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем ожидаемые номера деталей
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [2,3,4,5,6,7,8] as expected_numbers
+
+// Проверяем соответствие
+RETURN 
+  part_count as Фактическое_количество,
+  7 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 7 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name] AS Список_деталей;
+
+-- =============================================
+-- 6. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по созданным деталям
+MATCH (korpus:Assembly {number: '1'})-[r:CONTAINS]->(p:Part)
+RETURN 
+  'Узел: Корпус' as Сборочный_узел,
+  p.number as Номер_детали,
+  p.name as Наименование,
+  p.description as Описание,
+  p.material_spec as Материал,
+  p.category as Категория,
+  r.quantity as Количество,
+  r.unit as Единица_измерения,
+  p.drawing_number as Номер_чертежа,
+  p.standard as Стандарт
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 7. СВОДНАЯ СТАТИСТИКА
+-- =============================================
+
+// Сводка по материалам и категориям
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 2 AND toInteger(p.number) <= 8
+WITH 
+  COLLECT(DISTINCT p.material_spec) as materials,
+  COLLECT(DISTINCT p.category) as categories,
+  SUM(CASE WHEN p.quantity_per_unit IS NOT NULL THEN p.quantity_per_unit ELSE 1 END) as total_quantity,
+  COUNT(p) as part_count
+
+RETURN 
+  part_count as Всего_деталей,
+  total_quantity as Общее_количество_штук,
+  materials as Используемые_материалы,
+  categories as Категории_деталей,
+  'Корпусные детали и крепеж' as Группа;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 02 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;
