@@ -1,4 +1,6 @@
 # EBOM (Engineering Bill of Materials) - Шаровой кран
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/24767428-9c0f-4dfd-9495-a1e3ace8f06a" />
+
 
 Графовая база данных Neo4j, представляющая полную инженерную спецификацию (EBOM) шарового крана с требованиями к каждой детали.
 <img width="3625" height="3218" alt="graph (7)" src="https://github.com/user-attachments/assets/8e1b73ce-48d9-4a79-8ccd-83679a0336c8" />
