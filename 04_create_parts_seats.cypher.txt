@@ -1,0 +1,515 @@
+-- =============================================
+-- Создание деталей для узла "Седла и уплотнения шара" (Assembly 3)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 4 детали для сборочного узла "Седла и уплотнения шара"
+-- Детали 10-13: Седла и уплотнительные кольца
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Седла и уплотнения шара"
+MATCH (seats:Assembly {number: '3', name: 'Седла и уплотнения шара'})
+WITH count(seats) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Седла и уплотнения шара" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ СЕДЕЛ И УПЛОТНЕНИЙ (10-13)
+-- =============================================
+
+// Находим родительский узел "Седла и уплотнения шара"
+MATCH (seats_assembly:Assembly {number: '3', name: 'Седла и уплотнения шара'})
+
+// 10. Седло шаровое левое
+CREATE (p10:Part {
+    number: '10',
+    name: 'Седло шаровое левое',
+    description: 'Левое уплотнительное седло шарового элемента',
+    function: 'Обеспечение герметичности в зоне контакта с шаром',
+    material_spec: 'PTFE (политетрафторэтилен) с армированием',
+    material_grade: 'PTFE+25% стекловолокно',
+    hardness_shore: 'D65',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 62.2,
+    outer_diameter_mm: 85.0,
+    thickness_mm: 12.0,
+    sealing_width_mm: 8.0,
+    cone_angle: '15°',
+    
+    -- Механические свойства
+    compression_set: '≤ 15%',
+    friction_coefficient: '0.04-0.08',
+    wear_resistance: 'Высокая',
+    temperature_deformation: 'Минимальная',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-60 °C',
+    temperature_max: '200 °C',
+    chemical_resistance: 'Устойчиво к большинству сред',
+    media_compatibility: 'Универсальная',
+    
+    -- Технологические параметры
+    manufacturing_method: 'Прессование + механическая обработка',
+    tolerance_class: 'IT8',
+    surface_finish: 'Шлифованная',
+    
+    created: datetime(),
+    status: 'CRITICAL',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'SEAT',
+    drawing_number: 'КК-10-001',
+    standard: 'ГОСТ 10007-80',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    life_cycles: '≥ 5000 циклов',
+    replacement_interval: 'По состоянию',
+    preload_required: true,
+    lubrication_required: true,
+    assembly_press_fit: '0.1-0.2 мм'
+})
+
+// 11. Седло шаровое правое
+CREATE (p11:Part {
+    number: '11',
+    name: 'Седло шаровое правое',
+    description: 'Правое уплотнительное седло шарового элемента',
+    function: 'Обеспечение герметичности и восприятие осевых нагрузок',
+    material_spec: 'PTFE (политетрафторэтилен) с армированием',
+    material_grade: 'PTFE+25% стекловолокно',
+    hardness_shore: 'D65',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 62.2,
+    outer_diameter_mm: 85.0,
+    thickness_mm: 12.0,
+    sealing_width_mm: 8.0,
+    cone_angle: '15°',
+    
+    -- Механические свойства
+    compression_set: '≤ 15%',
+    friction_coefficient: '0.04-0.08',
+    wear_resistance: 'Высокая',
+    spring_constant: '25-30 N/mm',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-60 °C',
+    temperature_max: '200 °C',
+    chemical_resistance: 'Устойчиво к большинству сред',
+    
+    -- Особенности правого седла
+    load_type: 'ОСЕВАЯ + РАДИАЛЬНАЯ',
+    pressure_compensation: 'АВТОМАТИЧЕСКАЯ',
+    
+    created: datetime(),
+    status: 'CRITICAL',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'SEAT',
+    drawing_number: 'КК-11-001',
+    standard: 'ГОСТ 10007-80',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    life_cycles: '≥ 5000 циклов',
+    preload_spring: 'Встроенный пружинный элемент',
+    pressure_activated: true
+})
+
+// 12. Кольцо уплотнительное седла левое
+CREATE (p12:Part {
+    number: '12',
+    name: 'Кольцо уплотнительное седла левое',
+    description: 'Вторичное уплотнение левого седла',
+    function: 'Герметизация стыка седла с корпусом',
+    material_spec: 'FKM (фторкаучук)',
+    material_grade: 'FKM 75 Shore A',
+    color: 'Черный',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 84.0,
+    cross_section_mm: 2.5,
+    tolerance: 'G7',
+    
+    -- Механические свойства
+    hardness_shore: 'A75',
+    compression_set: '≤ 10%',
+    elasticity: 'Высокая',
+    tensile_strength: '≥ 15 MPa',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN25',
+    temperature_min: '-20 °C',
+    temperature_max: '200 °C',
+    chemical_resistance: 'Устойчиво к маслам, топливам',
+    media_compatibility: 'Нефтепродукты, химические среды',
+    
+    -- Технологические параметры
+    manufacturing_method: 'Литье под давлением',
+    flash_allowance: '≤ 0.1 мм',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'O_RING',
+    drawing_number: 'КК-12-001',
+    standard: 'ГОСТ 9833-73',
+    
+    -- Дополнительные атрибуты
+    shelf_life: '10 лет',
+    storage_conditions: 'В защищенном от света месте',
+    interchangeability: 'Стандартное'
+})
+
+// 13. Кольцо уплотнительное седла правое
+CREATE (p13:Part {
+    number: '13',
+    name: 'Кольцо уплотнительное седла правое',
+    description: 'Вторичное уплотнение правого седла',
+    function: 'Герметизация стыка седла с корпусом',
+    material_spec: 'FKM (фторкаучук)',
+    material_grade: 'FKM 75 Shore A',
+    color: 'Черный',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 84.0,
+    cross_section_mm: 2.5,
+    tolerance: 'G7',
+    
+    -- Механические свойства
+    hardness_shore: 'A75',
+    compression_set: '≤ 10%',
+    elasticity: 'Высокая',
+    extrusion_resistance: 'Высокая',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN25',
+    temperature_min: '-20 °C',
+    temperature_max: '200 °C',
+    chemical_resistance: 'Устойчиво к маслам, топливам',
+    
+    -- Особенности для правой стороны
+    pressure_direction: 'ОТ СРЕДЫ',
+    backup_ring_required: false,
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'O_RING',
+    drawing_number: 'КК-13-001',
+    standard: 'ГОСТ 9833-73',
+    
+    -- Дополнительные атрибуты
+    shelf_life: '10 лет',
+    installation_lubricant: 'Силиконовая смазка',
+    inspection_frequency: 'При каждой разборке'
+})
+
+RETURN '✓ Создано 4 детали седел и уплотнений (номера 10-13)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Седла и уплотнения шара"
+WITH seats_assembly
+MATCH (p10:Part {number: '10'})
+MATCH (p11:Part {number: '11'})
+MATCH (p12:Part {number: '12'})
+MATCH (p13:Part {number: '13'})
+
+// Создаем связи с атрибутами
+CREATE (seats_assembly)-[:CONTAINS {
+    relationship_id: 'SEATS-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    mounting_side: 'ЛЕВАЯ',
+    assembly_step: 'Установка в корпус левый',
+    preload_force: '10-15 N',
+    created: datetime()
+}]->(p10)
+
+CREATE (seats_assembly)-[:CONTAINS {
+    relationship_id: 'SEATS-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    mounting_side: 'ПРАВАЯ',
+    assembly_step: 'Установка в корпус правый',
+    preload_force: '10-15 N',
+    created: datetime()
+}]->(p11)
+
+CREATE (seats_assembly)-[:CONTAINS {
+    relationship_id: 'SEATS-003',
+    sequence: 3,
+    quantity: 1,
+    unit: 'шт',
+    mounting_location: 'ПОД СЕДЛОМ ЛЕВЫМ',
+    assembly_step: 'Установка перед монтажом седла',
+    lubrication: 'Требуется',
+    created: datetime()
+}]->(p12)
+
+CREATE (seats_assembly)-[:CONTAINS {
+    relationship_id: 'SEATS-004',
+    sequence: 4,
+    quantity: 1,
+    unit: 'шт',
+    mounting_location: 'ПОД СЕДЛОМ ПРАВЫМ',
+    assembly_step: 'Установка перед монтажом седла',
+    lubrication: 'Требуется',
+    created: datetime()
+}]->(p13)
+
+RETURN '✓ Создано 4 иерархические связи' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ ДЕТАЛЯМИ СЕДЕЛ
+-- =============================================
+
+// Связи между седлами и уплотнительными кольцами
+MATCH (seat_left:Part {number: '10'})
+MATCH (seat_right:Part {number: '11'})
+MATCH (oring_left:Part {number: '12'})
+MATCH (oring_right:Part {number: '13'})
+
+// Седло левое использует уплотнительное кольцо
+CREATE (seat_left)-[:USES_SEAL {
+    seal_type: 'STATIC_SEAL',
+    installation: 'НАРУЖНЫЙ ПАЗ',
+    compression: 'РАДИАЛЬНОЕ',
+    created: datetime()
+}]->(oring_left)
+
+// Седло правое использует уплотнительное кольцо
+CREATE (seat_right)-[:USES_SEAL {
+    seal_type: 'STATIC_SEAL',
+    installation: 'НАРУЖНЫЙ ПАЗ',
+    compression: 'РАДИАЛЬНОЕ',
+    created: datetime()
+}]->(oring_right)
+
+// Седла работают в паре
+CREATE (seat_left)-[:PAIRED_WITH {
+    pairing_type: 'OPPOSITE_SEATS',
+    alignment: 'СООСНОСТЬ ≤ 0.05 мм',
+    parallelism: '≤ 0.03 мм',
+    created: datetime()
+}]->(seat_right)
+
+RETURN '✓ Созданы связи между деталями седел' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С ШАРОМ (ЕСЛИ ОН СУЩЕСТВУЕТ)
+-- =============================================
+
+// Проверяем существование шара и создаем связи
+MATCH (seat_left:Part {number: '10'})
+MATCH (seat_right:Part {number: '11'})
+OPTIONAL MATCH (shar:Part {number: '9'})
+
+FOREACH (ignore IN CASE WHEN shar IS NOT NULL THEN [1] ELSE [] END |
+    // Левое седло взаимодействует с шаром
+    CREATE (seat_left)-[:SEALS_AGAINST {
+        interface_type: 'SPHERICAL',
+        contact_pressure: 'РАВНОМЕРНОЕ',
+        sealing_principle: 'ПОВЕРХНОСТНЫЙ КОНТАКТ',
+        wear_compensation: 'ПОСАДКА С НАТЯГОМ',
+        created: datetime()
+    }]->(shar)
+    
+    // Правое седло взаимодействует с шаром
+    CREATE (seat_right)-[:SEALS_AGAINST {
+        interface_type: 'SPHERICAL',
+        contact_pressure: 'РАВНОМЕРНОЕ',
+        sealing_principle: 'ПОВЕРХНОСТНЫЙ КОНТАКТ',
+        wear_compensation: 'ПРУЖИННЫЙ ЭЛЕМЕНТ',
+        created: datetime()
+    }]->(shar)
+)
+
+RETURN '✓ Созданы связи с шаром (если шар существует)' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ СВЯЗЕЙ С КОРПУСОМ (ЕСЛИ ОН СУЩЕСТВУЕТ)
+-- =============================================
+
+// Связи с корпусными деталями
+MATCH (seat_left:Part {number: '10'})
+MATCH (seat_right:Part {number: '11'})
+OPTIONAL MATCH (korpus_left:Part {number: '2'})
+OPTIONAL MATCH (korpus_right:Part {number: '3'})
+
+FOREACH (ignore IN CASE WHEN korpus_left IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (seat_left)-[:INSTALLED_IN {
+        fit_type: 'PRESS_FIT',
+        interference: '0.1-0.2 мм',
+        retention: 'ПОСАДКА С НАТЯГОМ',
+        created: datetime()
+    }]->(korpus_left)
+)
+
+FOREACH (ignore IN CASE WHEN korpus_right IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (seat_right)-[:INSTALLED_IN {
+        fit_type: 'PRESS_FIT',
+        interference: '0.1-0.2 мм',
+        retention: 'ПОСАДКА С НАТЯГОМ',
+        created: datetime()
+    }]->(korpus_right)
+)
+
+RETURN '✓ Созданы связи с корпусом (если корпус существует)' AS Статус;
+
+-- =============================================
+-- 6. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем количество созданных деталей
+MATCH (seats:Assembly {number: '3'})-[:CONTAINS]->(part:Part)
+WITH seats, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем ожидаемые номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [10,11,12,13] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  4 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 4 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 7. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по седлам и уплотнениям
+MATCH (seats:Assembly {number: '3'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[seal_rel:SEALS_AGAINST]->(shar:Part)
+OPTIONAL MATCH (p)-[install_rel:INSTALLED_IN]->(korpus:Part)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  p.pressure_rating as 'Давление, PN',
+  p.temperature_min as 'Темп. мин, °C',
+  p.temperature_max as 'Темп. макс, °C',
+  
+  -- Геометрические параметры
+  CASE 
+    WHEN p.inner_diameter_mm IS NOT NULL THEN toString(p.inner_diameter_mm) + ' мм'
+    ELSE '-'
+  END as 'Внутр. диаметр',
+  CASE 
+    WHEN p.thickness_mm IS NOT NULL THEN toString(p.thickness_mm) + ' мм'
+    ELSE '-'
+  END as 'Толщина',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.mounting_side as Сторона,
+  r.assembly_step as 'Этап сборки',
+  
+  -- Связи
+  CASE 
+    WHEN shar IS NOT NULL THEN shar.number + ': ' + shar.name
+    ELSE 'Нет связи'
+  END as 'Связь с шаром',
+  CASE 
+    WHEN korpus IS NOT NULL THEN korpus.number + ': ' + korpus.name
+    ELSE 'Нет связи'
+  END as 'Связь с корпусом',
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 8. СТАТИСТИКА ПО МАТЕРИАЛАМ И КАТЕГОРИЯМ
+-- =============================================
+
+// Анализ материалов и категорий
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 10 AND toInteger(p.number) <= 13
+WITH 
+  COLLECT(DISTINCT p.material_spec) as materials,
+  COLLECT(DISTINCT p.category) as categories,
+  COLLECT(DISTINCT p.subcategory) as subcategories,
+  COUNT(p) as total_parts,
+  SUM(CASE WHEN p.status = 'CRITICAL' THEN 1 ELSE 0 END) as critical_parts
+
+RETURN 
+  total_parts as Всего_деталей,
+  critical_parts as Критических_деталей,
+  materials as Используемые_материалы,
+  categories as Категории,
+  subcategories as Подкатегории,
+  'Уплотнительные элементы высокого давления' as Назначение;
+
+-- =============================================
+-- 9. СОЗДАНИЕ СПЕЦИАЛИЗИРОВАННЫХ ИНДЕКСОВ
+-- =============================================
+
+// Индексы для уплотнительных элементов
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.subcategory)
+WHERE p.category = 'SEALING_ELEMENT'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.material_spec)
+WHERE p.material_spec CONTAINS 'PTFE' OR p.material_spec CONTAINS 'FKM'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.pressure_rating)
+
+RETURN '✓ Созданы специализированные индексы для уплотнений' AS Статус;
+
+-- =============================================
+-- 10. ПРОВЕРКА ФУНКЦИОНАЛЬНОЙ ЦЕЛОСТНОСТИ
+-- =============================================
+
+// Проверка комплектности уплотнительного узла
+MATCH (seats:Assembly {number: '3'})
+OPTIONAL MATCH (seats)-[:CONTAINS]->(seat:Part {subcategory: 'SEAT'})
+OPTIONAL MATCH (seats)-[:CONTAINS]->(oring:Part {subcategory: 'O_RING'})
+WITH seats,
+     COLLECT(DISTINCT seat) as seats_list,
+     COLLECT(DISTINCT oring) as orings_list,
+     COUNT(DISTINCT seat) as seat_count,
+     COUNT(DISTINCT oring) as oring_count
+
+RETURN 
+  seats.name as Узел,
+  seat_count as Количество_седел,
+  oring_count as Количество_уплотнений,
+  CASE 
+    WHEN seat_count = 2 AND oring_count = 2 THEN '✓ Комплект полный'
+    WHEN seat_count = 2 AND oring_count < 2 THEN '⚠ Не хватает уплотнений'
+    WHEN seat_count < 2 AND oring_count = 2 THEN '⚠ Не хватает седел'
+    ELSE '✗ Неполный комплект'
+  END as Статус_комплектности,
+  [s IN seats_list | s.number + ' (' + s.mounting_side + ')'] as Седла,
+  [o IN orings_list | o.number] as Уплотнительные_кольца;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 04 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

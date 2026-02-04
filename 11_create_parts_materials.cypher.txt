@@ -1,0 +1,750 @@
+-- =============================================
+-- Создание деталей для узла "Нормируемые материалы" (Assembly 10)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 2 нормируемых материала для сборочного узла "Нормируемые материалы"
+-- Детали 35-36: Смазка сборочная и консервационное покрытие
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Нормируемые материалы"
+MATCH (materials:Assembly {number: '10', name: 'Нормируемые материалы'})
+WITH count(materials) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Нормируемые материалы" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ НОРМИРУЕМЫХ МАТЕРИАЛОВ (35-36)
+-- =============================================
+
+// Находим родительский узел "Нормируемые материалы"
+MATCH (materials_assembly:Assembly {number: '10', name: 'Нормируемые материалы'})
+
+// 35. Смазка сборочная
+CREATE (p35:Part {
+    number: '35',
+    name: 'Смазка сборочная',
+    description: 'Специальная высокотемпературная антифрикционная смазка',
+    function: 'Снижение трения в подвижных соединениях, защита от износа, предотвращение заедания',
+    material_type: 'СМАЗОЧНЫЙ МАТЕРИАЛ',
+    base_material: 'ЛИТИЕВОЕ МЫЛО',
+    thickener: 'ЛИТИЕВЫЙ 12-ОКСИСТЕАРАТ',
+    base_oil: 'МИНЕРАЛЬНОЕ МАСЛО ISO VG 150',
+    
+    -- Физико-химические свойства
+    consistency_nlgi: '2',
+    penetration: '265-295',
+    dropping_point: '≥ 190°C',
+    oil_separation: '≤ 5%',
+    color: 'ЖЕЛТЫЙ',
+    
+    -- Механические свойства
+    viscosity_at_40°C: '150 мм²/с',
+    viscosity_at_100°C: '15 мм²/с',
+    viscosity_index: '95',
+    shear_stability: 'ВЫСОКАЯ',
+    
+    -- Противоизносные характеристики
+    four_ball_wear: '≤ 0.5 мм',
+    weld_load: '≥ 2500 N',
+    load_carrying_capacity: 'ВЫСОКАЯ',
+    friction_coefficient: '0.08-0.12',
+    
+    -- Температурные характеристики
+    operating_temperature_min: '-30°C',
+    operating_temperature_max: '150°C',
+    short_term_max: '180°C',
+    low_temperature_torque: '≤ 1.0 Н·м при -30°C',
+    
+    -- Коррозионные свойства
+    copper_corrosion: '1А',
+    rust_protection: 'А',
+    salt_spray_resistance: '≥ 500 часов',
+    water_resistance: '≥ 90%',
+    
+    -- Совместимость
+    material_compatibility: [
+      'СТАЛЬ',
+      'ЧУГУН',
+      'БРОНЗА',
+      'ЛАЙСАН (PTFE)',
+      'РЕЗИНА NBR, FKM'
+    ],
+    elastomer_compatibility: 'ХОРОШАЯ',
+    paint_compatibility: 'НЕ РАЗРУШАЕТ ЛКП',
+    
+    -- Упаковка и дозировка
+    packaging_type: 'ТУБА 100 Г',
+    package_material: 'АЛЮМИНИЕВАЯ ТУБА',
+    application_method: 'РУЧНАЯ ИЛИ ПНЕВМОПИСТОЛЕТ',
+    coverage_rate: '0.5 Г/СМ²',
+    
+    created: datetime(),
+    status: 'CONSUMABLE',
+    category: 'PROCESS_MATERIAL',
+    subcategory: 'ASSEMBLY_LUBRICANT',
+    specification_number: 'ТУ 38.101952-87',
+    safety_data_sheet: 'SDS-LUB-001',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    shelf_life: '36 МЕСЯЦЕВ',
+    storage_conditions: '+5°C ... +25°C, В СУХОМ МЕСТЕ',
+    disposal_method: 'СОГЛАСНО ГОСТ 30775-2001',
+    fire_class: 'КЛАСС Г1',
+    eco_label: 'БЕЗ СВИНЦА И ГАЛОГЕНОВ',
+    quantity_per_unit: '100 Г'
+})
+
+// 36. Консервационное покрытие
+CREATE (p36:Part {
+    number: '36',
+    name: 'Консервационное покрытие',
+    description: 'Временное защитное покрытие для хранения и транспортировки',
+    function: 'Защита металлических поверхностей от коррозии во время хранения и транспортировки',
+    material_type: 'ЗАЩИТНОЕ ПОКРЫТИЕ',
+    base_type: 'ВОСКОВАЯ КОМПОЗИЦИЯ',
+    solvent_type: 'УГЛЕВОДОРОДНЫЙ',
+    
+    -- Физико-химические свойства
+    appearance: 'ПРОЗРАЧНАЯ ЖИДКОСТЬ',
+    color: 'СОЛОМЕННЫЙ',
+    density: '0.85 Г/СМ³',
+    viscosity_at_20°C: '35 МПА·С',
+    flash_point: '≥ 60°C',
+    dry_time: '2-4 ЧАСА',
+    
+    -- Защитные свойства
+    corrosion_protection: [
+      'АТМОСФЕРНАЯ КОРРОЗИЯ',
+      'СОЛЕВОЙ ТУМАН',
+      'ВЫСОКАЯ ВЛАЖНОСТЬ',
+      'ПРОМЫШЛЕННАЯ АТМОСФЕРА'
+    ],
+    salt_spray_test: '≥ 300 ЧАСОВ',
+    humidity_test: '≥ 500 ЧАСОВ',
+    outdoor_protection: '6-12 МЕСЯЦЕВ',
+    indoor_protection: '24 МЕСЯЦА',
+    
+    -- Методы нанесения
+    application_methods: [
+      'ПОГРУЖЕНИЕ',
+      'ОБМАЗЫВАНИЕ',
+      'РАСПЫЛЕНИЕ',
+      'КИСТЬ'
+    ],
+    film_thickness: '15-25 МКМ',
+    coverage_rate: '10-12 М²/КГ',
+    
+    -- Температурные характеристики
+    application_temperature: '+5°C ... +35°C',
+    storage_temperature: '-20°C ... +40°C',
+    operating_temperature: '-40°C ... +80°C',
+    
+    -- Совместимость и удаляемость
+    substrate_compatibility: [
+      'СТАЛЬ ЧЕРНАЯ',
+      'СТАЛЬ НЕРЖАВЕЮЩАЯ',
+      'ЧУГУН',
+      'ЦВЕТНЫЕ МЕТАЛЛЫ'
+    ],
+    removability: 'ЛЕГКО УДАЛЯЕТСЯ',
+    removal_methods: [
+      'МОЮЩИЕ СРЕДСТВА',
+      'УАЙТ-СПИРИТ',
+      'МЕХАНИЧЕСКАЯ ОЧИСТКА'
+    ],
+    residue_after_removal: 'МИНИМАЛЬНЫЙ',
+    
+    -- Экологические показатели
+    voc_content: '≤ 350 Г/Л',
+    hazardous_components: 'ОТСУТСТВУЮТ',
+    biodegradability: '≥ 60%',
+    disposal_class: 'НЕОПАСНЫЕ ОТХОДЫ',
+    
+    -- Упаковка
+    packaging_type: 'КАНИСТРА 1 Л',
+    package_material: 'ПЛАСТИК HDPE',
+    secondary_packaging: 'КАРТОННАЯ КОРОБКА',
+    
+    created: datetime(),
+    status: 'CONSUMABLE',
+    category: 'PROCESS_MATERIAL',
+    subcategory: 'PROTECTIVE_COATING',
+    specification_number: 'ТУ 2312-024-05016415-2002',
+    safety_data_sheet: 'SDS-COAT-001',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    shelf_life: '24 МЕСЯЦА',
+    storage_conditions: 'В ЗАЩИЩЕННОМ ОТ СОЛНЦА МЕСТЕ',
+    mixing_required: 'ПЕРЕД ПРИМЕНЕНИЕМ',
+    application_environment: 'ХОРОШАЯ ВЕНТИЛЯЦИЯ',
+    personal_protection: 'ПЕРЧАТКИ, ОЧКИ',
+    quantity_per_unit: '1 Л'
+})
+
+RETURN '✓ Создано 2 нормируемых материала (номера 35-36)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем материалы с узлом "Нормируемые материалы"
+WITH materials_assembly
+MATCH (p35:Part {number: '35'})
+MATCH (p36:Part {number: '36'})
+
+// Создаем связи с атрибутами
+CREATE (materials_assembly)-[:CONTAINS {
+    relationship_id: 'MATERIAL-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'туба',
+    application_scope: 'СБОРОЧНЫЕ ОПЕРАЦИИ',
+    consumption_rate: '5 Г/ИЗДЕЛИЕ',
+    application_stage: 'ПРЕДВАРИТЕЛЬНАЯ СБОРКА',
+    created: datetime()
+}]->(p35)
+
+CREATE (materials_assembly)-[:CONTAINS {
+    relationship_id: 'MATERIAL-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'канистра',
+    application_scope: 'КОНСЕРВАЦИЯ И ХРАНЕНИЕ',
+    consumption_rate: '50 МЛ/ИЗДЕЛИЕ',
+    application_stage: 'ЗАКЛЮЧИТЕЛЬНАЯ ОПЕРАЦИЯ',
+    created: datetime()
+}]->(p36)
+
+RETURN '✓ Создано 2 иерархические связи' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ ПРИМЕНЕНИЯ СМАЗКИ
+-- =============================================
+
+// Связи применения смазки к деталям
+MATCH (lubricant:Part {number: '35'})
+OPTIONAL MATCH (stem:Part {number: '14'})
+OPTIONAL MATCH (shar:Part {number: '9'})
+OPTIONAL MATCH (seat_left:Part {number: '10'})
+OPTIONAL MATCH (seat_right:Part {number: '11'})
+OPTIONAL MATCH (packing:Part {number: '19'})
+
+// Смазка применяется на штоке
+FOREACH (ignore IN CASE WHEN stem IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (lubricant)-[:APPLIED_TO {
+        application_area: 'ПОВЕРХНОСТЬ ШТОКА ПОД УПЛОТНЕНИЯМИ',
+        application_method: 'РАВНОМЕРНЫЙ СЛОЙ',
+        thickness: '0.1-0.2 ММ',
+        purpose: 'СНИЖЕНИЕ ТРЕНИЯ, ЗАЩИТА ОТ ИЗНОСА',
+        created: datetime()
+    }]->(stem)
+)
+
+// Смазка применяется на шаре
+FOREACH (ignore IN CASE WHEN shar IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (lubricant)-[:APPLIED_TO {
+        application_area: 'СФЕРИЧЕСКАЯ ПОВЕРХНОСТЬ ШАРА',
+        application_method: 'ТОНКИЙ РАВНОМЕРНЫЙ СЛОЙ',
+        thickness: '0.05-0.1 ММ',
+        purpose: 'ОБЕСПЕЧЕНИЕ ПОВОРОТА, ГЕРМЕТИЗАЦИЯ',
+        created: datetime()
+    }]->(shar)
+)
+
+// Смазка применяется на седлах
+FOREACH (ignore IN CASE WHEN seat_left IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (lubricant)-[:APPLIED_TO {
+        application_area: 'КОНИЧЕСКАЯ ПОВЕРХНОСТЬ СЕДЛА',
+        application_method: 'ТОЧЕЧНОЕ НАНЕСЕНИЕ',
+        thickness: 'МИНИМАЛЬНЫЙ СЛОЙ',
+        purpose: 'СНИЖЕНИЕ МОМЕНТА ПОВОРОТА',
+        created: datetime()
+    }]->(seat_left)
+)
+
+FOREACH (ignore IN CASE WHEN seat_right IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (lubricant)-[:APPLIED_TO {
+        application_area: 'КОНИЧЕСКАЯ ПОВЕРХНОСТЬ СЕДЛА',
+        application_method: 'ТОЧЕЧНОЕ НАНЕСЕНИЕ',
+        thickness: 'МИНИМАЛЬНЫЙ СЛОЙ',
+        purpose: 'СНИЖЕНИЕ МОМЕНТА ПОВОРОТА',
+        created: datetime()
+    }]->(seat_right)
+)
+
+// Смазка применяется на сальниковой набивке
+FOREACH (ignore IN CASE WHEN packing IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (lubricant)-[:APPLIED_TO {
+        application_area: 'НАРУЖНАЯ ПОВЕРХНОСТЬ КОЛЕЦ САЛЬНИКА',
+        application_method: 'ЛЕГКОЕ СМАЗЫВАНИЕ',
+        thickness: 'СЛЕДКУЮЩИЙ СЛОЙ',
+        purpose: 'ОБЛЕГЧЕНИЕ УСТАНОВКИ, НАЧАЛЬНАЯ СМАЗКА',
+        created: datetime()
+    }]->(packing)
+)
+
+RETURN '✓ Созданы связи применения смазки' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ ПРИМЕНЕНИЯ ПОКРЫТИЯ
+-- =============================================
+
+// Связи применения консервационного покрытия
+MATCH (coating:Part {number: '36'})
+OPTIONAL MATCH (korpus_left:Part {number: '2'})
+OPTIONAL MATCH (korpus_right:Part {number: '3'})
+OPTIONAL MATCH (cover:Part {number: '21'})
+OPTIONAL MATCH (inlet:Part {number: '31'})
+OPTIONAL MATCH (outlet:Part {number: '32'})
+
+// Покрытие наносится на корпусные детали
+FOREACH (ignore IN CASE WHEN korpus_left IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (coating)-[:APPLIED_TO {
+        application_area: 'НАРУЖНЫЕ ПОВЕРХНОСТИ КОРПУСА',
+        application_method: 'РАСПЫЛЕНИЕ ИЛИ ОБМАЗЫВАНИЕ',
+        thickness: '15-25 МКМ',
+        purpose: 'ЗАЩИТА ОТ КОРРОЗИИ ПРИ ХРАНЕНИИ',
+        drying_time: '4 ЧАСА',
+        created: datetime()
+    }]->(korpus_left)
+)
+
+FOREACH (ignore IN CASE WHEN korpus_right IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (coating)-[:APPLIED_TO {
+        application_area: 'НАРУЖНЫЕ ПОВЕРХНОСТИ КОРПУСА',
+        application_method: 'РАСПЫЛЕНИЕ ИЛИ ОБМАЗЫВАНИЕ',
+        thickness: '15-25 МКМ',
+        purpose: 'ЗАЩИТА ОТ КОРРОЗИИ ПРИ ХРАНЕНИИ',
+        drying_time: '4 ЧАСА',
+        created: datetime()
+    }]->(korpus_right)
+)
+
+// Покрытие наносится на крышку
+FOREACH (ignore IN CASE WHEN cover IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (coating)-[:APPLIED_TO {
+        application_area: 'НАРУЖНЫЕ ПОВЕРХНОСТИ КРЫШКИ',
+        application_method: 'РАСПЫЛЕНИЕ',
+        thickness: '15-25 МКМ',
+        purpose: 'КОРРОЗИОННАЯ ЗАЩИТА',
+        created: datetime()
+    }]->(cover)
+)
+
+// Покрытие наносится на патрубки
+FOREACH (ignore IN CASE WHEN inlet IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (coating)-[:APPLIED_TO {
+        application_area: 'ФЛАНЦЕВЫЕ ПОВЕРХНОСТИ И НАРУЖНЫЕ СТЕНКИ',
+        application_method: 'ОБМАЗЫВАНИЕ',
+        thickness: '20-25 МКМ',
+        purpose: 'ЗАЩИТА ОТ КОРРОЗИИ ДО УСТАНОВКИ',
+        created: datetime()
+    }]->(inlet)
+)
+
+FOREACH (ignore IN CASE WHEN outlet IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (coating)-[:APPLIED_TO {
+        application_area: 'ФЛАНЦЕВЫЕ ПОВЕРХНОСТИ И НАРУЖНЫЕ СТЕНКИ',
+        application_method: 'ОБМАЗЫВАНИЕ',
+        thickness: '20-25 МКМ',
+        purpose: 'ЗАЩИТА ОТ КОРРОЗИИ ДО УСТАНОВКИ',
+        created: datetime()
+    }]->(outlet)
+)
+
+RETURN '✓ Созданы связи применения покрытия' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ ТЕХНОЛОГИЧЕСКИХ ПРОЦЕДУР
+-- =============================================
+
+// Создаем процедуру применения смазки
+CREATE (lubrication_procedure:ApplicationProcedure {
+    procedure_id: 'APP-LUB-001',
+    procedure_name: 'Процедура смазки при сборке',
+    applicable_material: '35',
+    
+    -- Подготовка
+    preparation_steps: [
+        'Очистить поверхности от загрязнений',
+        'Обезжирить растворителем',
+        'Высушить на воздухе',
+        'Подготовить смазку (перемешать при необходимости)'
+    ],
+    
+    -- Нанесение
+    application_steps: [
+        'Нанести тонкий равномерный слой на шар',
+        'Нанести смазку на седла в 4 точках',
+        'Смазать шток в зоне уплотнений',
+        'Легко смазать сальниковые кольца',
+        'Удалить излишки чистой тканью'
+    ],
+    
+    -- Контроль качества
+    quality_checks: [
+        'Равномерность нанесения',
+        'Отсутствие загрязнений',
+        'Толщина слоя не более 0.2 мм',
+        'Отсутствие смазки в запрещенных зонах'
+    ],
+    
+    -- Запрещенные зоны
+    prohibited_areas: [
+      'ВНУТРЕННИЙ ДИАМЕТР ПАТРУБКОВ',
+      'ПОВЕРХНОСТИ ПОД ПРОКЛАДКИ',
+      'РЕЗЬБОВЫЕ СОЕДИНЕНИЯ (кроме указанных)',
+      'МЕСТА КОНТАКТА С РАБОЧЕЙ СРЕДОЙ'
+    ],
+    
+    -- Оборудование и инструмент
+    equipment: ['КИСТИ', 'ШПАТЕЛИ', 'ПНЕВМОПИСТОЛЕТ'],
+    ppe_required: ['ПЕРЧАТКИ', 'ЗАЩИТНЫЕ ОЧКИ'],
+    
+    created: datetime()
+})
+
+// Связываем процедуру со смазкой
+MATCH (lubricant:Part {number: '35'})
+CREATE (lubricant)-[:HAS_APPLICATION_PROCEDURE]->(lubrication_procedure)
+
+RETURN '✓ Создана процедура применения смазки' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ ПРОЦЕДУРЫ КОНСЕРВАЦИИ
+-- =============================================
+
+// Создаем процедуру консервации
+CREATE (preservation_procedure:ApplicationProcedure {
+    procedure_id: 'APP-PRES-001',
+    procedure_name: 'Процедура консервации изделия',
+    applicable_material: '36',
+    
+    -- Условия нанесения
+    application_conditions: [
+        'Температура окружающей среды: +10°C ... +30°C',
+        'Относительная влажность: ≤ 70%',
+        'Хорошая вентиляция помещения',
+        'Чистота поверхностей'
+    ],
+    
+    -- Этапы нанесения
+    application_steps: [
+        'Очистить поверхности от загрязнений и масел',
+        'Протереть растворителем',
+        'Тщательно перемешать консервант',
+        'Нанести равномерным слоем методом распыления',
+        'Дать высохнуть в течение 4 часов',
+        'Проверить качество покрытия'
+    ],
+    
+    -- Контроль качества
+    quality_checks: [
+        'Равномерность покрытия',
+        'Отсутствие подтеков',
+        'Полное покрытие всех поверхностей',
+        'Толщина 15-25 мкм'
+    ],
+    
+    -- Маркировка
+    marking_requirements: [
+        'Наклейка "КОНСЕРВИРОВАНО"',
+        'Дата консервации',
+        'Срок действия консервации',
+        'Указание по удалению'
+    ],
+    
+    -- Упаковка
+    packaging_requirements: [
+        'Полиэтиленовая пленка',
+        'Силовой каркас',
+        'Влагопоглотитель',
+        'Предупредительные знаки'
+    ],
+    
+    created: datetime()
+})
+
+// Связываем процедуру с покрытием
+MATCH (coating:Part {number: '36'})
+CREATE (coating)-[:HAS_APPLICATION_PROCEDURE]->(preservation_procedure)
+
+RETURN '✓ Создана процедура консервации' AS Статус;
+
+-- =============================================
+-- 7. СОЗДАНИЕ ТРЕБОВАНИЙ БЕЗОПАСНОСТИ И ЭКОЛОГИИ
+-- =============================================
+
+// Создаем требования безопасности для материалов
+CREATE (safety_requirements:MaterialSafety {
+    requirement_id: 'MAT-SAFETY-001',
+    title: 'Требования безопасности и экологии для материалов',
+    
+    -- Классификация опасности
+    hazard_classification: [
+        'НЕ ОПАСНЫЙ ДЛЯ ОКРУЖАЮЩЕЙ СРЕДЫ',
+        'НЕ ВЗРЫВООПАСНЫЙ',
+        'НЕ ГОРЮЧИЙ (КЛАСС Г1)',
+        'НЕ ТОКСИЧНЫЙ'
+    ],
+    
+    -- Требования к хранению
+    storage_requirements: [
+        'В ЗАКРЫТОЙ ТАРЕ',
+        'В СУХОМ МЕСТЕ',
+        'ВНЕ ЗОНЫ ПРЯМЫХ СОЛНЕЧНЫХ ЛУЧЕЙ',
+        'В ОТДЕЛЕНИИ ДЛЯ ХИМИЧЕСКИХ ВЕЩЕСТВ'
+    ],
+    
+    -- Средства индивидуальной защиты
+    ppe_requirements: [
+        'ЗАЩИТНЫЕ ПЕРЧАТКИ (НИТРИЛОВЫЕ)',
+        'ЗАЩИТНЫЕ ОЧКИ',
+        'РЕСПИРАТОР ПРИ РАСПЫЛЕНИИ',
+        'ЗАЩИТНАЯ ОДЕЖДА'
+    ],
+    
+    -- Утилизация
+    disposal_requirements: [
+        'СОГЛАСНО МЕСТНЫМ ПРАВИЛАМ',
+        'НЕ СЛИВАТЬ В КАНАЛИЗАЦИЮ',
+        'ПЕРЕДАВАТЬ ЛИЦЕНЗИРОВАННЫМ ОРГАНИЗАЦИЯМ',
+        'СОБЛЮДАТЬ ГОСТ 30775-2001'
+    ],
+    
+    -- Аварийные процедуры
+    emergency_procedures: [
+        'ПРИ ПОПАДАНИИ В ГЛАЗА - ПРОМЫТЬ ВОДОЙ',
+        'ПРИ ПОПАДАНИИ НА КОЖУ - СМЫТЬ МЫЛОМ',
+        'ПРИ ПРОЛИВЕ - СОБРАТЬ АБСОРБЕНТОМ',
+        'ПРИ ВОЗГОРАНИИ - ПЕНОГАСИТЕЛЬ'
+    ],
+    
+    created: datetime()
+})
+
+// Связываем требования с материалами
+MATCH (lubricant:Part {number: '35'})
+MATCH (coating:Part {number: '36'})
+CREATE (lubricant)-[:MUST_COMPLY_WITH_SAFETY]->(safety_requirements)
+CREATE (coating)-[:MUST_COMPLY_WITH_SAFETY]->(safety_requirements)
+
+RETURN '✓ Созданы требования безопасности' AS Статус;
+
+-- =============================================
+-- 8. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные материалы
+MATCH (materials:Assembly {number: '10'})-[:CONTAINS]->(part:Part)
+WITH materials, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [35,36] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  2 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 2 THEN '✓ Количество материалов корректно'
+    ELSE '✗ Ошибка: несоответствие количества материалов'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера материалов соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров материалов'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_материалов;
+
+-- =============================================
+-- 9. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по нормируемым материалам
+MATCH (materials:Assembly {number: '10'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:HAS_APPLICATION_PROCEDURE]->(proc:ApplicationProcedure)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_type as Тип_материала,
+  
+  -- Основные параметры
+  CASE 
+    WHEN p.consistency_nlgi IS NOT NULL THEN 'NLGI ' + p.consistency_nlgi
+    WHEN p.appearance IS NOT NULL THEN p.appearance
+    ELSE '-'
+  END as Консистенция,
+  
+  CASE 
+    WHEN p.operating_temperature_min IS NOT NULL 
+      AND p.operating_temperature_max IS NOT NULL
+    THEN p.operating_temperature_min + ' ... ' + p.operating_temperature_max
+    WHEN p.application_temperature IS NOT NULL
+    THEN p.application_temperature
+    ELSE '-'
+  END as 'Температурный диапазон',
+  
+  -- Упаковка и расход
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.consumption_rate as 'Норма расхода',
+  
+  -- Процедуры
+  CASE 
+    WHEN proc IS NOT NULL THEN proc.procedure_name
+    ELSE '-'
+  END as 'Процедура применения',
+  
+  p.specification_number as Спецификация,
+  p.safety_data_sheet as 'Паспорт безопасности',
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 10. АНАЛИЗ НОРМИРУЕМЫХ МАТЕРИАЛОВ
+-- =============================================
+
+// Анализ нормируемых материалов
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 35 AND toInteger(p.number) <= 36
+WITH 
+  SUM(CASE WHEN p.subcategory = 'ASSEMBLY_LUBRICANT' THEN 1 ELSE 0 END) as lubricants,
+  SUM(CASE WHEN p.subcategory = 'PROTECTIVE_COATING' THEN 1 ELSE 0 END) as coatings,
+  COUNT(p) as total_materials,
+  COLLECT(DISTINCT p.material_type) as material_types,
+  SUM(CASE WHEN p.status = 'CONSUMABLE' THEN 1 ELSE 0 END) as consumables
+
+RETURN 
+  total_materials as Всего_материалов,
+  lubricants as Смазок,
+  coatings as Покрытий,
+  consumables as Расходных_материалов,
+  material_types as Типы_материалов,
+  'Технологические материалы для сборки и защиты' as Назначение;
+
+-- =============================================
+-- 11. СОЗДАНИЕ ИНДЕКСОВ
+-- =============================================
+
+// Специальные индексы для нормируемых материалов
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.category)
+WHERE p.category = 'PROCESS_MATERIAL'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.subcategory)
+WHERE p.subcategory IN ['ASSEMBLY_LUBRICANT', 'PROTECTIVE_COATING']
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.shelf_life)
+
+RETURN '✓ Созданы специализированные индексы для нормируемых материалов' AS Статус;
+
+-- =============================================
+-- 12. ПРОВЕРКА ФУНКЦИОНАЛЬНОСТИ И КОМПЛЕКТНОСТИ
+-- =============================================
+
+// Проверка комплектности технологических материалов
+MATCH (materials:Assembly {number: '10'})
+OPTIONAL MATCH (materials)-[:CONTAINS]->(lubricant:Part {subcategory: 'ASSEMBLY_LUBRICANT'})
+OPTIONAL MATCH (materials)-[:CONTAINS]->(coating:Part {subcategory: 'PROTECTIVE_COATING'})
+
+WITH materials, lubricant, coating,
+     CASE WHEN lubricant IS NOT NULL THEN lubricant.quantity_per_unit ELSE NULL END as lubricant_qty,
+     CASE WHEN coating IS NOT NULL THEN coating.quantity_per_unit ELSE NULL END as coating_qty
+
+RETURN 
+  materials.name as Узел,
+  CASE WHEN lubricant IS NOT NULL THEN lubricant.name ELSE 'Нет' END as Смазка,
+  CASE WHEN coating IS NOT NULL THEN coating.name ELSE 'Нет' END as Покрытие,
+  lubricant_qty as 'Кол-во смазки',
+  coating_qty as 'Кол-во покрытия',
+  CASE 
+    WHEN lubricant IS NOT NULL AND coating IS NOT NULL 
+    THEN '✓ Полный комплект технологических материалов'
+    WHEN lubricant IS NOT NULL AND coating IS NULL 
+    THEN '⚠ Нет консервационного покрытия'
+    WHEN lubricant IS NULL AND coating IS NOT NULL 
+    THEN '⚠ Нет смазки'
+    ELSE '✗ Нет технологических материалов'
+  END as Статус_комплектности;
+
+-- =============================================
+-- 13. СОЗДАНИЕ СВЯЗЕЙ С ПРОИЗВОДСТВЕННЫМИ ПРОЦЕССАМИ
+-- =============================================
+
+// Создаем связи с производственными процессами
+CREATE (production_processes:ProductionProcess {
+    process_id: 'PROC-MAT-001',
+    title: 'Производственные процессы применения материалов',
+    
+    processes: [
+      {
+        process: 'СМАЗКА ПРИ СБОРКЕ',
+        stage: 'СБОРОЧНЫЙ ЦЕХ',
+        equipment: ['СБОРОЧНЫЙ СТЕНД', 'ПНЕВМОПИСТОЛЕТ'],
+        personnel: 'СБОРЩИК 4 РАЗРЯДА',
+        quality_control: 'ОТК'
+      },
+      {
+        process: 'КОНСЕРВАЦИЯ ИЗДЕЛИЯ',
+        stage: 'УПАКОВОЧНЫЙ ЦЕХ',
+        equipment: ['РАСПЫЛИТЕЛЬ', 'СУШИЛЬНАЯ КАМЕРА'],
+        personnel: 'УПАКОВЩИК 3 РАЗРЯДА',
+        quality_control: 'ОТК И ЛАБОРАТОРИЯ'
+      }
+    ],
+    
+    documentation: [
+      'ТЕХНОЛОГИЧЕСКАЯ КАРТА ТК-СМАЗКА-001',
+      'ТЕХНОЛОГИЧЕСКАЯ КАРТА ТК-КОНСЕРВ-001',
+      'ЖУРНАЛ УЧЕТА РАСХОДА МАТЕРИАЛОВ'
+    ],
+    
+    created: datetime()
+})
+
+// Связываем материалы с процессами
+MATCH (lubricant:Part {number: '35'})
+MATCH (coating:Part {number: '36'})
+CREATE (lubricant)-[:USED_IN_PROCESS]->(production_processes)
+CREATE (coating)-[:USED_IN_PROCESS]->(production_processes)
+
+RETURN '✓ Созданы связи с производственными процессами' AS Статус;
+
+-- =============================================
+-- 14. АНАЛИЗ СОВМЕСТИМОСТИ И ПРИМЕНЕНИЯ
+-- =============================================
+
+// Анализ совместимости материалов с деталями
+MATCH (lubricant:Part {number: '35'})
+MATCH (coating:Part {number: '36'})
+WITH lubricant, coating
+
+RETURN 
+  'Анализ совместимости материалов' as Анализ,
+  lubricant.name as Смазка,
+  lubricant.material_compatibility as 'Совместимость смазки',
+  lubricant.operating_temperature_max as 'Макс. температура смазки',
+  
+  coating.name as Покрытие,
+  coating.substrate_compatibility as 'Совместимость покрытия',
+  coating.outdoor_protection as 'Срок защиты на улице',
+  
+  'Материалы совместимы со всеми компонентами крана' as Заключение;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 11 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

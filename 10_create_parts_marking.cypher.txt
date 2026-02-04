@@ -1,0 +1,604 @@
+-- =============================================
+-- Создание деталей для узла "Маркировка и сервис" (Assembly 9)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 2 детали для сборочного узла "Маркировка и сервис"
+-- Детали 33-34: Табличка паспортная и крепеж
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Маркировка и сервис"
+MATCH (marking:Assembly {number: '9', name: 'Маркировка и сервис'})
+WITH count(marking) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Маркировка и сервис" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ МАРКИРОВКИ И СЕРВИСА (33-34)
+-- =============================================
+
+// Находим родительский узел "Маркировка и сервис"
+MATCH (marking_assembly:Assembly {number: '9', name: 'Маркировка и сервис'})
+
+// 33. Табличка паспортная
+CREATE (p33:Part {
+    number: '33',
+    name: 'Табличка паспортная',
+    description: 'Шильдик с техническими данными и идентификацией изделия',
+    function: 'Идентификация, предоставление технической информации, отслеживаемость',
+    material_spec: 'Алюминий АД1',
+    material_grade: 'EN AW-1050A',
+    manufacturing_method: 'ШТАМПОВКА + ГРАВИРОВКА',
+    
+    -- Геометрические параметры
+    length_mm: 100.0,
+    width_mm: 60.0,
+    thickness_mm: 1.5,
+    corner_radius_mm: 3.0,
+    mounting_holes_count: 2,
+    mounting_holes_diameter_mm: 4.2,
+    hole_spacing_mm: 80.0,
+    
+    -- Технологические параметры
+    surface_finish: 'МАТОВАЯ АНОДИРОВАННАЯ',
+    anodizing_thickness: '15-20 мкм',
+    anodizing_color: 'СЕРЕБРИСТЫЙ',
+    marking_method: 'ЛАЗЕРНАЯ ГРАВИРОВКА',
+    marking_depth: '0.2-0.3 мм',
+    
+    -- Информационное содержание
+    required_information: [
+        'НАИМЕНОВАНИЕ ИЗДЕЛИЯ: ШАРОВОЙ КРАН',
+        'НОМЕР ЗАВОДСКОЙ: [уникальный номер]',
+        'ДАТА ИЗГОТОВЛЕНИЯ: [дата]',
+        'DN: 50',
+        'PN: 16',
+        'РАБОЧАЯ СРЕДА: ВОДА, ПАР, ВОЗДУХ',
+        'ТЕМПЕРАТУРА: -40°C ... +300°C',
+        'НОМЕР ЧЕРТЕЖА: КК-000',
+        'ИЗГОТОВИТЕЛЬ: [название предприятия]',
+        'СТАНДАРТ: ГОСТ 33259-2015'
+    ],
+    
+    -- Маркировочные параметры
+    font_type: 'АРИАЛ',
+    font_size: '2.5 мм (заголовок), 2.0 мм (текст)',
+    contrast_ratio: '≥ 70%',
+    braille_required: false,
+    qr_code: true,
+    qr_content: 'TECHNICAL_DATA_SHEET_LINK',
+    
+    -- Долговечность и защита
+    weather_resistance: 'IP67',
+    uv_resistance: 'УСТОЙЧИВА К УФ-ИЗЛУЧЕНИЮ',
+    chemical_resistance: 'УСТОЙЧИВА К МАСЛАМ И РАСТВОРИТЕЛЯМ',
+    temperature_range: '-60°C ... +150°C',
+    expected_lifetime: '25 лет',
+    
+    created: datetime(),
+    status: 'MANDATORY',
+    category: 'IDENTIFICATION',
+    subcategory: 'NAME_PLATE',
+    drawing_number: 'КК-33-001',
+    standard: 'ГОСТ 12969-67',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    serial_number_location: 'НИЖНИЙ ПРАВЫЙ УГОЛ',
+    revision_field: true,
+    inspection_stamps: '3 ПУНКТА',
+    multilingual: false,
+    language: 'РУССКИЙ',
+    installation_verification: 'ОБЯЗАТЕЛЬНА'
+})
+
+// 34. Заклёпка / винт крепления таблички
+CREATE (p34:Part {
+    number: '34',
+    name: 'Заклёпка / винт крепления таблички',
+    description: 'Крепежный элемент для фиксации паспортной таблички',
+    function: 'Надежное крепление таблички к корпусу крана',
+    material_spec: 'Нержавеющая сталь A2',
+    material_grade: 'AISI 304',
+    
+    -- Конструктивные варианты
+    fastener_type: 'ВЫБОР: ЗАКЛЕПКА ИЛИ ВИНТ',
+    
+    -- Вариант 1: Заклепка вытяжная
+    rivet_diameter_mm: 4.0,
+    rivet_length_mm: 8.0,
+    rivet_head_type: 'ПОЛУКРУГЛАЯ',
+    rivet_head_diameter_mm: 8.0,
+    rivet_material: 'АЛЮМИНИЙ АД1',
+    
+    -- Вариант 2: Винт
+    screw_thread: 'М4×0.7',
+    screw_length_mm: 10.0,
+    screw_head_type: 'ПОТАЙНАЯ',
+    screw_head_drive: 'КРЕСТ PZ2',
+    screw_material: 'СТАЛЬ ОЦИНКОВАННАЯ',
+    
+    -- Механические свойства
+    shear_strength: '≥ 1500 N',
+    pull_out_strength: '≥ 800 N',
+    vibration_resistance: 'ВЫСОКАЯ',
+    corrosion_resistance: 'КЛАСС А2',
+    
+    -- Установочные параметры
+    installation_tool: 'ЗАКЛЕПОЧНЫЙ ПИСТОЛЕТ ИЛИ ОТВЕРТКА',
+    installation_torque: '1.5-2.0 Н·м (для винта)',
+    installation_force: '200-300 N (для заклепки)',
+    
+    -- Защитные характеристики
+    self_locking: true,
+    tamper_resistant: true,
+    visual_indicator: 'ГОЛОВКА ОКРАШЕНА В КРАСНЫЙ ЦВЕТ',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'FASTENER',
+    subcategory: 'PLATE_FASTENER',
+    drawing_number: 'КК-34-001',
+    standard: 'ГОСТ 10299-80 / ГОСТ 17473-80',
+    
+    -- Дополнительные атрибуты
+    quantity_per_unit: 2,
+    sealing_required: true,
+    sealant_type: 'СИЛИКОНОВЫЙ ГЕРМЕТИК',
+    removal_tool: 'СВЕРЛО 4.2 ММ (ДЛЯ ЗАКЛЕПОК)',
+    reuse_allowed: false,
+    anti_theft_feature: 'СПЕЦИАЛЬНЫЙ ПРОФИЛЬ ГОЛОВКИ'
+})
+
+RETURN '✓ Создано 2 детали маркировки и сервиса (номера 33-34)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Маркировка и сервис"
+WITH marking_assembly
+MATCH (p33:Part {number: '33'})
+MATCH (p34:Part {number: '34'})
+
+// Создаем связи с атрибутами
+CREATE (marking_assembly)-[:CONTAINS {
+    relationship_id: 'MARKING-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'ЛИЦЕВАЯ ПОВЕРХНОСТЬ КОРПУСА',
+    orientation: 'ГОРИЗОНТАЛЬНО',
+    visibility_requirement: 'ХОРОШАЯ ВИДИМОСТЬ',
+    created: datetime()
+}]->(p33)
+
+CREATE (marking_assembly)-[:CONTAINS {
+    relationship_id: 'MARKING-002',
+    sequence: 2,
+    quantity: 2,
+    unit: 'шт',
+    assembly_position: 'ЧЕРЕЗ ОТВЕРСТИЯ ТАБЛИЧКИ',
+    fastening_method: 'ПОСТОЯННОЕ КРЕПЛЕНИЕ',
+    removal_requirement: 'СПЕЦИАЛЬНЫМ ИНСТРУМЕНТОМ',
+    created: datetime()
+}]->(p34)
+
+RETURN '✓ Создано 2 иерархические связи' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ ТАБЛИЧКОЙ И КРЕПЕЖОМ
+-- =============================================
+
+// Связи между табличкой и крепежом
+MATCH (plate:Part {number: '33'})
+MATCH (fastener:Part {number: '34'})
+
+// Табличка крепится с помощью крепежных элементов
+CREATE (plate)-[:SECURED_BY {
+    fastening_points: 2,
+    spacing: '80 мм',
+    alignment: 'ПО ЦЕНТРУ ОТВЕРСТИЙ',
+    load_distribution: 'РАВНОМЕРНОЕ',
+    created: datetime()
+}]->(fastener)
+
+// Крепеж устанавливается в табличку
+CREATE (fastener)-[:INSTALLED_IN {
+    hole_preparation: 'СКРУГЛЕННЫЕ КРОМКИ',
+    clearance: '0.2-0.3 мм',
+    sealing_application: 'ПОД ГОЛОВКОЙ',
+    created: datetime()
+}]->(plate)
+
+RETURN '✓ Созданы связи между табличкой и крепежом' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С КОРПУСОМ КРАНА
+-- =============================================
+
+// Связи таблички с корпусом крана
+MATCH (plate:Part {number: '33'})
+MATCH (fastener:Part {number: '34'})
+OPTIONAL MATCH (korpus:Part {number: '2'})
+
+FOREACH (ignore IN CASE WHEN korpus IS NOT NULL THEN [1] ELSE [] END |
+    // Табличка устанавливается на корпус
+    CREATE (plate)-[:MOUNTED_ON {
+        mounting_surface: 'ПЛОСКАЯ ЧАСТЬ КОРПУСА',
+        surface_preparation: 'ОБЕЗЖИРИВАНИЕ',
+        positioning: 'ВЕРХНИЙ ЛЕВЫЙ УГОЛ',
+        orientation_mark: 'ВЕРХ',
+        created: datetime()
+    }]->(korpus)
+    
+    // Крепеж фиксирует табличку на корпусе
+    CREATE (fastener)-[:ATTACHES_TO {
+        thread_insert: 'ЗАКЛЕПОЧНАЯ ГИЛЬЗА',
+        retention_force: '≥ 500 N',
+        vibration_damping: 'РЕЗИНОВАЯ ПРОКЛАДКА',
+        created: datetime()
+    }]->(korpus)
+)
+
+RETURN '✓ Созданы связи с корпусом крана' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ ТРЕБОВАНИЙ К МАРКИРОВКЕ И ИДЕНТИФИКАЦИИ
+-- =============================================
+
+// Создаем нормативные требования к маркировке
+CREATE (marking_standards:MarkingStandards {
+    standard_id: 'MARK-STD-001',
+    title: 'Нормативные требования к маркировке оборудования',
+    
+    applicable_standards: [
+        'ГОСТ 12969-67 "Таблички паспортные. Технические условия"',
+        'ГОСТ 2.601-2013 "Эксплуатационные документы"',
+        'ТР ТС 010/2011 "О безопасности машин и оборудования"',
+        'ГОСТ Р 12.2.143-2009 "Система стандартов безопасности труда"',
+        'ISO 3864 "Графические символы. Цвета безопасности"'
+    ],
+    
+    mandatory_information: [
+        'Наименование и тип изделия',
+        'Заводской номер',
+        'Год изготовления',
+        'Номинальные параметры (DN, PN)',
+        'Рабочая среда и температура',
+        'Изготовитель и его адрес',
+        'Знаки соответствия',
+        'Предупреждающие надписи'
+    ],
+    
+    -- Требования к исполнению
+    durability_requirements: [
+        'Устойчивость к погодным условиям',
+        'Сохранение читаемости не менее 15 лет',
+        'Устойчивость к истиранию',
+        'Химическая стойкость'
+    ],
+    
+    -- Безопасность
+    safety_symbols: [
+        'ПРЕДУПРЕЖДЕНИЕ О ВЫСОКОМ ДАВЛЕНИИ',
+        'УКАЗАНИЕ НАПРАВЛЕНИЯ ПОТОКА',
+        'ТРЕБОВАНИЕ ИСПОЛЬЗОВАНИЯ СИЗ',
+        'ЗАПРЕТ НА РАЗБОРКУ ПОД ДАВЛЕНИЕМ'
+    ],
+    
+    created: datetime()
+})
+
+// Связываем требования с табличкой
+MATCH (plate:Part {number: '33'})
+CREATE (plate)-[:MUST_COMPLY_WITH {
+    compliance_level: 'ОБЯЗАТЕЛЬНО',
+    certification_required: true,
+    created: datetime()
+}]->(marking_standards)
+
+RETURN '✓ Созданы требования к маркировке' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ СЕРВИСНОЙ ИНФОРМАЦИИ
+-- =============================================
+
+// Создаем сервисную информацию
+CREATE (service_info:ServiceInformation {
+    info_id: 'SERVICE-INFO-001',
+    title: 'Сервисная информация для таблички',
+    
+    -- Контактная информация
+    manufacturer_contacts: [
+        'ТЕХНИЧЕСКАЯ ПОДДЕРЖКА: +7 (XXX) XXX-XX-XX',
+        'ЭЛЕКТРОННАЯ ПОЧТА: support@manufacturer.ru',
+        'ВЕБ-САЙТ: www.manufacturer.ru',
+        'АДРЕС: [адрес завода]'
+    ],
+    
+    -- Сервисные данные
+    service_interval: '12 месяцев',
+    maintenance_procedures: [
+        'ВИЗУАЛЬНЫЙ ОСМОТР',
+        'ПРОВЕРКА ГЕРМЕТИЧНОСТИ',
+        'СМАЗКА МЕХАНИЗМА',
+        'ПРОВЕРКА МОМЕНТА ЗАТЯЖКИ'
+    ],
+    
+    -- Запасные части
+    spare_parts_info: [
+        'НОМЕР КАТАЛОГА: KSh-50-16',
+        'СРОКИ ПОСТАВКИ: 14-21 день',
+        'ГАРАНТИЯ: 24 месяца'
+    ],
+    
+    -- Документация
+    documentation_references: [
+        'ПАСПОРТ: ПШК-50-16',
+        'РУКОВОДСТВО ПО ЭКСПЛУАТАЦИИ: РЭ-КШ-50',
+        'КАТАЛОГ ЗАПЧАСТЕЙ: КЗ-КШ-50'
+    ],
+    
+    -- QR-код информация
+    qr_code_data: {
+        url: 'https://manufacturer.ru/tech-data/KSh-50-16',
+        content_type: 'ТЕХНИЧЕСКАЯ ДОКУМЕНТАЦИЯ',
+        update_frequency: 'ПО МЕРЕ НЕОБХОДИМОСТИ'
+    },
+    
+    created: datetime()
+})
+
+// Связываем сервисную информацию с табличкой
+MATCH (plate:Part {number: '33'})
+CREATE (plate)-[:CONTAINS_SERVICE_INFO]->(service_info)
+
+RETURN '✓ Создана сервисная информация' AS Статус;
+
+-- =============================================
+-- 7. СОЗДАНИЕ СВЯЗЕЙ С ДОКУМЕНТАЦИЕЙ
+-- =============================================
+
+// Создаем узлы документации
+CREATE (technical_documentation:TechnicalDocumentation {
+    doc_id: 'DOC-TECH-001',
+    document_type: 'ПАСПОРТ ИЗДЕЛИЯ',
+    
+    documents: [
+        'ПАСПОРТ ШАРОВОГО КРАНА ДУ50 РУ16',
+        'СЕРТИФИКАТ СООТВЕТСТВИЯ',
+        'ПРОТОКОЛ ИСПЫТАНИЙ',
+        'АКТ ПРИЕМКИ'
+    ],
+    
+    document_formats: ['PDF', 'БУМАЖНЫЙ НОСИТЕЛЬ'],
+    language: 'РУССКИЙ',
+    revision: '1.0',
+    issue_date: '2024-01-15',
+    validity_period: 'БЕССРОЧНО',
+    
+    storage_location: 'АРХИВ ПРЕДПРИЯТИЯ',
+    digital_copy_url: 'https://docs.manufacturer.ru/KSh-50-16',
+    
+    created: datetime()
+})
+
+// Связываем с табличкой
+MATCH (plate:Part {number: '33'})
+CREATE (plate)-[:REFERENCED_IN]->(technical_documentation)
+
+RETURN '✓ Созданы связи с документацией' AS Статус;
+
+-- =============================================
+-- 8. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные детали
+MATCH (marking:Assembly {number: '9'})-[:CONTAINS]->(part:Part)
+WITH marking, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [33,34] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  2 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 2 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 9. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по маркировке и сервису
+MATCH (marking:Assembly {number: '9'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:MUST_COMPLY_WITH]->(standards:MarkingStandards)
+OPTIONAL MATCH (p)-[:CONTAINS_SERVICE_INFO]->(service:ServiceInformation)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  
+  -- Технические параметры
+  CASE 
+    WHEN p.length_mm IS NOT NULL THEN toString(p.length_mm) + '×' + toString(p.width_mm) + ' мм'
+    WHEN p.rivet_diameter_mm IS NOT NULL THEN 'Ø' + toString(p.rivet_diameter_mm) + ' мм'
+    ELSE '-'
+  END as Размеры,
+  
+  CASE 
+    WHEN p.status = 'MANDATORY' THEN 'ОБЯЗАТЕЛЬНАЯ'
+    WHEN p.weather_resistance IS NOT NULL THEN p.weather_resistance
+    WHEN p.corrosion_resistance IS NOT NULL THEN p.corrosion_resistance
+    ELSE '-'
+  END as Характеристика,
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.assembly_position as Позиция,
+  
+  -- Нормативные требования
+  CASE 
+    WHEN standards IS NOT NULL THEN 'Соответствует стандартам'
+    WHEN service IS NOT NULL THEN 'Сервисная информация'
+    ELSE '-'
+  END as Дополнительно,
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 10. АНАЛИЗ МАРКИРОВОЧНОЙ СИСТЕМЫ
+-- =============================================
+
+// Анализ системы маркировки
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 33 AND toInteger(p.number) <= 34
+WITH 
+  SUM(CASE WHEN p.category = 'IDENTIFICATION' THEN 1 ELSE 0 END) as identification_parts,
+  SUM(CASE WHEN p.category = 'FASTENER' THEN 1 ELSE 0 END) as fastener_parts,
+  COUNT(p) as total_parts,
+  COLLECT(DISTINCT p.material_spec) as materials,
+  SUM(CASE WHEN p.status = 'MANDATORY' THEN 1 ELSE 0 END) as mandatory_parts
+
+RETURN 
+  total_parts as Всего_деталей,
+  identification_parts as 'Идентификационных элементов',
+  fastener_parts as 'Крепежных элементов',
+  mandatory_parts as 'Обязательных деталей',
+  materials as Используемые_материалы,
+  'Система идентификации и отслеживания' as Назначение;
+
+-- =============================================
+-- 11. СОЗДАНИЕ ИНДЕКСОВ
+-- =============================================
+
+// Специальные индексы для маркировочных элементов
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.status)
+WHERE p.status = 'MANDATORY'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.category)
+WHERE p.category = 'IDENTIFICATION'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.expected_lifetime)
+
+RETURN '✓ Созданы специализированные индексы для маркировки' AS Статус;
+
+-- =============================================
+-- 12. ПРОВЕРКА КОМПЛЕКТНОСТИ И ФУНКЦИОНАЛЬНОСТИ
+-- =============================================
+
+// Проверка комплектности системы маркировки
+MATCH (marking:Assembly {number: '9'})
+OPTIONAL MATCH (marking)-[:CONTAINS]->(plate:Part {subcategory: 'NAME_PLATE'})
+OPTIONAL MATCH (marking)-[:CONTAINS]->(fastener:Part {subcategory: 'PLATE_FASTENER'})
+
+WITH marking, plate, fastener,
+     CASE WHEN fastener IS NOT NULL THEN fastener.quantity_per_unit ELSE 0 END as fastener_count
+
+RETURN 
+  marking.name as Узел,
+  CASE WHEN plate IS NOT NULL THEN '✓' ELSE '✗' END as Табличка,
+  CASE WHEN fastener IS NOT NULL THEN '✓' ELSE '✗' END as Крепеж,
+  fastener_count as 'Крепежей на комплект',
+  CASE 
+    WHEN plate IS NOT NULL AND fastener IS NOT NULL AND fastener_count >= 2 
+    THEN '✓ Полный комплект маркировки'
+    WHEN plate IS NOT NULL AND fastener IS NOT NULL AND fastener_count < 2 
+    THEN '⚠ Недостаточно крепежа'
+    WHEN plate IS NULL AND fastener IS NOT NULL 
+    THEN '✗ Нет таблички'
+    WHEN plate IS NOT NULL AND fastener IS NULL 
+    THEN '✗ Нет крепежа'
+    ELSE '✗ Отсутствует система маркировки'
+  END as Статус_комплектности;
+
+-- =============================================
+-- 13. СОЗДАНИЕ СВЯЗЕЙ ТРАССИРУЕМОСТИ
+-- =============================================
+
+// Создаем систему трассируемости
+CREATE (traceability_system:TraceabilitySystem {
+    system_id: 'TRACE-SYS-001',
+    system_name: 'Система трассируемости оборудования',
+    
+    tracking_methods: [
+        'УНИКАЛЬНЫЙ СЕРИЙНЫЙ НОМЕР',
+        'QR-КОД С ССЫЛКОЙ НА БАЗУ ДАННЫХ',
+        'RFID-МЕТКА (ОПЦИОНАЛЬНО)',
+        'НАРУЖНАЯ МАРКИРОВКА'
+    ],
+    
+    tracked_information: [
+        'ИСТОРИЯ ПРОИЗВОДСТВА',
+        'МАТЕРИАЛЫ И КОМПОНЕНТЫ',
+        'РЕЗУЛЬТАТЫ ИСПЫТАНИЙ',
+        'ИСТОРИЯ ОБСЛУЖИВАНИЯ',
+        'ГАРАНТИЙНЫЕ ОБЯЗАТЕЛЬСТВА'
+    ],
+    
+    database_system: 'PLM/ERP СИСТЕМА',
+    data_retention: '30 ЛЕТ',
+    access_levels: ['ПРОИЗВОДИТЕЛЬ', 'СЕРВИС', 'ВЛАДЕЛЕЦ'],
+    
+    created: datetime()
+})
+
+// Связываем табличку с системой трассируемости
+MATCH (plate:Part {number: '33'})
+CREATE (plate)-[:PART_OF_TRACEABILITY_SYSTEM]->(traceability_system)
+
+RETURN '✓ Создана система трассируемости' AS Статус;
+
+-- =============================================
+-- 14. ПРОВЕРКА СООТВЕТСТВИЯ ТРЕБОВАНИЯМ
+-- =============================================
+
+// Проверка соответствия требованиям маркировки
+MATCH (plate:Part {number: '33'})
+OPTIONAL MATCH (plate)-[:MUST_COMPLY_WITH]->(standards:MarkingStandards)
+WITH plate, standards,
+     SIZE(plate.required_information) as info_items_count,
+     plate.expected_lifetime as durability
+
+RETURN 
+  'Проверка соответствия таблички' as Проверка,
+  plate.name as Элемент,
+  info_items_count as 'Количество информационных пунктов',
+  durability as 'Срок службы',
+  CASE 
+    WHEN standards IS NOT NULL AND info_items_count >= 8 AND durability >= '15 лет'
+    THEN '✓ Соответствует всем требованиям'
+    WHEN standards IS NOT NULL AND info_items_count < 8 
+    THEN '⚠ Недостаточно информации'
+    WHEN standards IS NULL 
+    THEN '✗ Нет ссылок на стандарты'
+    ELSE '⚠ Требуется дополнительная проверка'
+  END as Статус_соответствия;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 10 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

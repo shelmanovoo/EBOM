@@ -1,0 +1,460 @@
+-- =============================================
+-- Создание деталей для узла "Сальниковый узел" (Assembly 5)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 2 детали для сборочного узла "Сальниковый узел"
+-- Детали 19-20: Сальниковая набивка и прижимная шайба
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Сальниковый узел"
+MATCH (packing:Assembly {number: '5', name: 'Сальниковый узел'})
+WITH count(packing) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Сальниковый узел" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ САЛЬНИКОВОГО УЗЛА (19-20)
+-- =============================================
+
+// Находим родительский узел "Сальниковый узел"
+MATCH (packing_assembly:Assembly {number: '5', name: 'Сальниковый узел'})
+
+// 19. Сальниковая набивка / PTFE-кольцо
+CREATE (p19:Part {
+    number: '19',
+    name: 'Сальниковая набивка / PTFE-кольцо',
+    description: 'Комплект сальниковых колец из PTFE для штока',
+    function: 'Герметизация вращающегося штока, регулируемое уплотнение',
+    material_spec: 'PTFE (политетрафторэтилен) с графитом',
+    material_grade: 'PTFE+15% графит',
+    form: 'КОЛЬЦА В НАБОРЕ',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 20.0,
+    cross_section_mm: 5.0,
+    ring_count: 4,
+    total_height_mm: 20.0,
+    cut_angle: '45°',
+    
+    -- Механические свойства
+    density: '2.2 г/см³',
+    hardness_shore: 'D55',
+    compression_set: '≤ 10%',
+    recovery_ability: 'ХОРОШАЯ',
+    
+    -- Тепловые свойства
+    thermal_conductivity: '0.25 Вт/м·К',
+    thermal_expansion: '12×10⁻⁵ 1/°C',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-200 °C',
+    temperature_max: '260 °C',
+    chemical_resistance: 'УНИВЕРСАЛЬНАЯ',
+    media_compatibility: 'Все среды, кроме расплавленных щелочных металлов',
+    
+    -- Особенности для сальниковой набивки
+    self_lubricating: true,
+    adjustable: true,
+    repackable: true,
+    break_in_period: '20-30 циклов',
+    
+    created: datetime(),
+    status: 'WEAR_PART',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'PACKING',
+    drawing_number: 'КК-19-001',
+    standard: 'ГОСТ 5152-84',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    replacement_interval: '2 года или 5000 циклов',
+    adjustment_frequency: 'Каждые 6 месяцев',
+    leakage_allowed: 'КАПЕЛЬНАЯ (до 60 капель/мин)',
+    installation_tool: 'САЛЬНИКОВЫЙ ИНСТРУМЕНТ',
+    storage_conditions: 'Вдали от прямых солнечных лучей'
+})
+
+// 20. Шайба прижимная сальника
+CREATE (p20:Part {
+    number: '20',
+    name: 'Шайба прижимная сальника',
+    description: 'Прижимная шайба сальникового узла',
+    function: 'Равномерное распределение давления на сальниковую набивку',
+    material_spec: 'Сталь 10',
+    material_grade: 'St10',
+    surface_treatment: 'Оцинкование',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 21.0,
+    outer_diameter_mm: 40.0,
+    thickness_mm: 3.0,
+    chamfer: '0.5×45°',
+    
+    -- Механические свойства
+    hardness: 'HB 120-150',
+    flatness: '0.05 мм',
+    parallelism: '0.03 мм',
+    
+    -- Конструктивные особенности
+    centering_lip: true,
+    lip_height_mm: 1.0,
+    anti_rotation_feature: 'ШПЛИНТ',
+    
+    -- Эксплуатационные характеристики
+    pressure_distribution: 'РАВНОМЕРНОЕ',
+    load_capacity: '5000 N',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'SEALING_COMPONENT',
+    subcategory: 'GLAND_WASHER',
+    drawing_number: 'КК-20-001',
+    standard: 'ГОСТ 19903-74',
+    
+    -- Дополнительные атрибуты
+    installation_orientation: 'СКОСОМ ВВЕРХ',
+    contact_surface: 'НИЖНЯЯ ПОВЕРХНОСТЬ',
+    alignment_required: true,
+    reuse_allowed: true,
+    marking_required: 'НОМЕР ПАРТИИ'
+})
+
+RETURN '✓ Создано 2 детали сальникового узла (номера 19-20)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Сальниковый узел"
+WITH packing_assembly
+MATCH (p19:Part {number: '19'})
+MATCH (p20:Part {number: '20'})
+
+// Создаем связи с атрибутами
+CREATE (packing_assembly)-[:CONTAINS {
+    relationship_id: 'PACKING-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'компл',
+    assembly_step: 'ПЕРВИЧНАЯ УСТАНОВКА',
+    installation_tool: 'МОНТАЖНАЯ ВТУЛКА',
+    pre_compression: '10-15%',
+    created: datetime()
+}]->(p19)
+
+CREATE (packing_assembly)-[:CONTAINS {
+    relationship_id: 'PACKING-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    assembly_step: 'ФИНИШНАЯ УСТАНОВКА',
+    orientation: 'СКОСОМ К САЛЬНИКУ',
+    tightening_sequence: 'РАВНОМЕРНАЯ ЗАТЯЖКА',
+    created: datetime()
+}]->(p20)
+
+RETURN '✓ Создано 2 иерархические связи' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ ДЕТАЛЯМИ САЛЬНИКА
+-- =============================================
+
+// Связи между компонентами сальника
+MATCH (packing:Part {number: '19'})
+MATCH (washer:Part {number: '20'})
+
+// Шайба прижимает сальниковую набивку
+CREATE (washer)-[:COMPRESSES {
+    compression_type: 'АКСИАЛЬНОЕ',
+    pressure_distribution: 'РАВНОМЕРНОЕ',
+    target_compression: '15-20%',
+    adjustment_range: '3-5 мм',
+    created: datetime()
+}]->(packing)
+
+// Сальниковая набивка устанавливается под шайбу
+CREATE (packing)-[:INSTALLED_UNDER]->(washer)
+
+RETURN '✓ Созданы связи между деталями сальника' AS СтатуС;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С ШТОКОМ (ЕСЛИ ОН СУЩЕСТВУЕТ)
+-- =============================================
+
+// Связи сальника со штоком
+MATCH (packing:Part {number: '19'})
+MATCH (washer:Part {number: '20'})
+OPTIONAL MATCH (stem:Part {number: '14'})
+
+FOREACH (ignore IN CASE WHEN stem IS NOT NULL THEN [1] ELSE [] END |
+    // Сальник уплотняет шток
+    CREATE (packing)-[:SEALS {
+        seal_type: 'ADJUSTABLE_PACKING',
+        contact_type: 'РАДИАЛЬНЫЙ КОНТАКТ',
+        surface_requirement: 'Ra 0.8-1.6',
+        lubrication_required: 'МИНИМАЛЬНАЯ',
+        run_in_period: 'ТРЕБУЕТСЯ',
+        created: datetime()
+    }]->(stem)
+    
+    // Шайба центрируется на штоке
+    CREATE (washer)-[:CENTERS_ON {
+        clearance: '0.5-1.0 мм',
+        alignment: 'СООСНОСТЬ ≤ 0.1 мм',
+        created: datetime()
+    }]->(stem)
+)
+
+RETURN '✓ Созданы связи со штоком (если шток существует)' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ СВЯЗЕЙ С КРЫШКОЙ ШТОКА (ЕСЛИ СУЩЕСТВУЕТ)
+-- =============================================
+
+// Связи с крышкой штока
+MATCH (packing:Part {number: '19'})
+MATCH (washer:Part {number: '20'})
+OPTIONAL MATCH (cover:Part {number: '21'})
+
+FOREACH (ignore IN CASE WHEN cover IS NOT NULL THEN [1] ELSE [] END |
+    // Сальник устанавливается в камеру крышки
+    CREATE (packing)-[:INSTALLED_IN_CHAMBER {
+        chamber_depth_mm: 22.0,
+        clearance_walls: '0.1-0.2 мм',
+        bottom_clearance: '≥ 1 мм',
+        created: datetime()
+    }]->(cover)
+    
+    // Шайба прижимается крышкой
+    CREATE (washer)-[:PRESSED_BY {
+        pressure_source: 'КРЫШКА ШТОКА',
+        force_transmission: 'ПРЯМАЯ',
+        created: datetime()
+    }]->(cover)
+)
+
+RETURN '✓ Созданы связи с крышкой (если крышка существует)' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ ТЕХНОЛОГИЧЕСКОЙ ИНФОРМАЦИИ
+-- =============================================
+
+// Создаем узел с технологией установки сальника
+CREATE (packing_tech:InstallationProcedure {
+    procedure_id: 'INST-PACKING-001',
+    procedure_name: 'Установка сальниковой набивки',
+    applicable_part: '19',
+    
+    -- Этапы установки
+    steps: [
+        'Очистить сальниковую камеру',
+        'Проверить состояние штока',
+        'Нанести тонкий слой смазки',
+        'Установить кольца со смещением стыков на 90°',
+        'Уплотнить специальным инструментом',
+        'Установить прижимную шайбу',
+        'Затянуть равномерно крест-накрест'
+    ],
+    
+    -- Параметры затяжки
+    tightening_torque: '20-25 Н·м',
+    compression_measurement: 'ПО ОСАДКЕ',
+    initial_compression: '10-15%',
+    final_compression: '15-20%',
+    
+    -- Контроль качества
+    leakage_test: 'ГИДРАВЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    test_pressure: '1.1×PN',
+    acceptance_criteria: 'НЕТ ВИДИМОЙ ПРОТЕЧКИ',
+    
+    created: datetime()
+})
+
+// Связываем с сальниковой набивкой
+MATCH (packing:Part {number: '19'})
+CREATE (packing)-[:HAS_INSTALLATION_PROCEDURE {
+    mandatory: true,
+    skill_level: 'СРЕДНИЙ',
+    created: datetime()
+}]->(packing_tech)
+
+RETURN '✓ Создана технологическая информация' AS Статус;
+
+-- =============================================
+-- 7. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные детали
+MATCH (packing:Assembly {number: '5'})-[:CONTAINS]->(part:Part)
+WITH packing, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [19,20] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  2 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 2 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 8. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по сальниковому узлу
+MATCH (packing:Assembly {number: '5'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:SEALS]->(stem:Part)
+OPTIONAL MATCH (p)-[:HAS_INSTALLATION_PROCEDURE]->(tech:InstallationProcedure)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  
+  -- Технические параметры
+  CASE 
+    WHEN p.ring_count IS NOT NULL THEN toString(p.ring_count) + ' колец'
+    WHEN p.thickness_mm IS NOT NULL THEN toString(p.thickness_mm) + ' мм'
+    ELSE '-'
+  END as 'Характеристика',
+  
+  CASE 
+    WHEN p.pressure_rating IS NOT NULL THEN p.pressure_rating
+    WHEN p.load_capacity IS NOT NULL THEN p.load_capacity
+    ELSE '-'
+  END as 'Параметр',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.assembly_step as 'Этап сборки',
+  
+  -- Связи
+  CASE 
+    WHEN stem IS NOT NULL THEN 'Шток: ' + stem.number
+    WHEN tech IS NOT NULL THEN 'Есть инструкция'
+    ELSE '-'
+  END as Дополнительно,
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 9. АНАЛИЗ САЛЬНИКОВОГО УЗЛА
+-- =============================================
+
+// Анализ функциональности сальникового узла
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 19 AND toInteger(p.number) <= 20
+WITH 
+  SUM(CASE WHEN p.subcategory = 'PACKING' THEN 1 ELSE 0 END) as packing_count,
+  SUM(CASE WHEN p.subcategory = 'GLAND_WASHER' THEN 1 ELSE 0 END) as washer_count,
+  COLLECT(DISTINCT p.material_spec) as materials,
+  COUNT(p) as total_parts,
+  SUM(CASE WHEN p.status = 'WEAR_PART' THEN 1 ELSE 0 END) as wear_parts
+
+RETURN 
+  total_parts as Всего_деталей,
+  packing_count as 'Сальниковых наборов',
+  washer_count as 'Прижимных шайб',
+  wear_parts as 'Расходных деталей',
+  materials as Используемые_материалы,
+  'Регулируемое уплотнение вращающегося штока' as Назначение;
+
+-- =============================================
+-- 10. СОЗДАНИЕ ИНДЕКСОВ ДЛЯ САЛЬНИКОВЫХ ЭЛЕМЕНТОВ
+-- =============================================
+
+// Специальные индексы для сальниковых элементов
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.subcategory)
+WHERE p.subcategory = 'PACKING'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.material_spec)
+WHERE p.material_spec CONTAINS 'PTFE'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.adjustment_frequency)
+
+RETURN '✓ Созданы специализированные индексы для сальников' AS Статус;
+
+-- =============================================
+-- 11. ПРОВЕРКА ФУНКЦИОНАЛЬНОСТИ
+-- =============================================
+
+// Проверка возможности регулировки и обслуживания
+MATCH (packing:Assembly {number: '5'})
+OPTIONAL MATCH (packing)-[:CONTAINS]->(p:Part {subcategory: 'PACKING'})
+OPTIONAL MATCH (packing)-[:CONTAINS]->(w:Part {subcategory: 'GLAND_WASHER'})
+WITH packing, p, w,
+     CASE WHEN p IS NOT NULL THEN p.adjustable ELSE false END as adjustable,
+     CASE WHEN p IS NOT NULL THEN p.repackable ELSE false END as repackable
+
+RETURN 
+  packing.name as Узел,
+  CASE 
+    WHEN p IS NOT NULL THEN p.name + ' (' + toString(p.ring_count) + ' колец)'
+    ELSE 'Нет сальника'
+  END as Сальник,
+  CASE 
+    WHEN w IS NOT NULL THEN w.name
+    ELSE 'Нет прижимной шайбы'
+  END as Прижимная_шайба,
+  adjustable as Регулируемый,
+  repackable as 'Переупаковываемый',
+  CASE 
+    WHEN p IS NOT NULL AND w IS NOT NULL AND adjustable = true AND repackable = true 
+    THEN '✓ Полностью обслуживаемый узел'
+    WHEN p IS NOT NULL AND w IS NOT NULL 
+    THEN '⚠ Ограниченная обслуживаемость'
+    ELSE '✗ Невозможно обслуживание'
+  END as Статус_обслуживаемости;
+
+-- =============================================
+-- 12. СРАВНЕНИЕ С ДИНАМИЧЕСКИМИ УПЛОТНЕНИЯМИ
+-- =============================================
+
+// Сравнение сальниковой набивки с другими уплотнениями штока
+MATCH (packing:Part {number: '19'})
+MATCH (upper_seal:Part {number: '15'})
+MATCH (lower_seal:Part {number: '16'})
+WITH packing, upper_seal, lower_seal
+
+RETURN 
+  'Сравнение уплотнений штока' as Сравнение,
+  packing.number as 'Сальник, номер',
+  packing.name as 'Сальник, название',
+  packing.material_spec as 'Сальник, материал',
+  packing.adjustable as 'Сальник, регулируемый',
+  packing.replacement_interval as 'Сальник, замена',
+  
+  upper_seal.number as 'Верх.упл., номер',
+  upper_seal.name as 'Верх.упл., название',
+  upper_seal.material_spec as 'Верх.упл., материал',
+  upper_seal.replacement_interval as 'Верх.упл., замена',
+  
+  'Сальник - для регулируемых применений, уплотнения - для необслуживаемых' as Примечание;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 06 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

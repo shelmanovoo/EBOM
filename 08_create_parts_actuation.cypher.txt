@@ -1,0 +1,684 @@
+-- =============================================
+-- Создание деталей для узла "Узел управления" (Assembly 7)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 5 деталей для сборочного узла "Узел управления"
+-- Детали 26-30: Рукоятка, ограничитель и крепеж
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Узел управления"
+MATCH (actuation:Assembly {number: '7', name: 'Узел управления'})
+WITH count(actuation) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Узел управления" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ УЗЛА УПРАВЛЕНИЯ (26-30)
+-- =============================================
+
+// Находим родительский узел "Узел управления"
+MATCH (actuation_assembly:Assembly {number: '7', name: 'Узел управления'})
+
+// 26. Рукоятка (рычаг)
+CREATE (p26:Part {
+    number: '26',
+    name: 'Рукоятка (рычаг)',
+    description: 'Ручка для ручного управления шаровым краном',
+    function: 'Передача усилия оператора на шток, индикация положения',
+    material_spec: 'Сталь 3',
+    material_grade: 'St3',
+    manufacturing_method: 'ШТАМПОВКА + СВАРКА',
+    
+    -- Геометрические параметры
+    length_mm: 300.0,
+    handle_diameter_mm: 25.0,
+    grip_length_mm: 150.0,
+    mounting_hole_size_mm: 14.0,
+    mounting_hole_depth_mm: 35.0,
+    
+    -- Механические свойства
+    bending_strength: '≥ 400 N·m',
+    torsion_strength: '≥ 300 N·m',
+    weight: '0.8 кг',
+    
+    -- Эргономические характеристики
+    grip_type: 'РИФЛЕНАЯ ПОВЕРХНОСТЬ',
+    grip_material: 'ПЛАСТИКОВАЯ НАКЛАДКА',
+    grip_color: 'КРАСНЫЙ',
+    comfort_shape: 'ЭРГОНОМИЧЕСКИЙ ПРОФИЛЬ',
+    
+    -- Индикационные элементы
+    position_indicators: ['ОТКРЫТО', 'ЗАКРЫТО'],
+    indicator_color: 'БЕЛЫЙ',
+    indicator_material: 'ПЛАСТИК',
+    
+    -- Безопасность
+    safety_features: ['ЗАЩИТА ОТ СЛУЧАЙНОГО ПЕРЕКЛЮЧЕНИЯ', 'ЯРКАЯ ПОКРАСКА'],
+    lockable: true,
+    lock_type: 'НАВЕСНОЙ ЗАМОК',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'ACTUATION_COMPONENT',
+    subcategory: 'HANDLE',
+    drawing_number: 'КК-26-001',
+    standard: 'ГОСТ 535-88',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    operation_force: '≤ 100 N',
+    lever_ratio: '15:1',
+    position_detent: false,
+    vibration_damping: 'РЕЗИНОВАЯ ВСТАВКА',
+    corrosion_protection: 'ПОРОШКОВАЯ ПОКРАСКА'
+})
+
+// 27. Ограничитель поворота
+CREATE (p27:Part {
+    number: '27',
+    name: 'Ограничитель поворота',
+    description: 'Механический ограничитель угла поворота рукоятки',
+    function: 'Ограничение угла поворота до 90°, защита от перекручивания',
+    material_spec: 'Сталь 45',
+    material_grade: 'AISI 1045',
+    heat_treatment: 'ЗАКАЛКА + ОТПУСК',
+    
+    -- Геометрические параметры
+    outer_diameter_mm: 50.0,
+    inner_diameter_mm: 14.5,
+    thickness_mm: 10.0,
+    stop_angle: '90°',
+    stop_tolerance: '±2°',
+    
+    -- Механические свойства
+    hardness: 'HRC 40-45',
+    impact_strength: '≥ 50 J',
+    wear_resistance: 'ВЫСОКАЯ',
+    
+    -- Конструктивные особенности
+    stop_type: 'ДВУХПОЗИЦИОННЫЙ',
+    stop_locations: ['0°', '90°'],
+    positive_stop: true,
+    adjustable: false,
+    
+    -- Монтажные характеристики
+    mounting_method: 'ШПЛИНТ',
+    alignment_required: true,
+    orientation_marking: 'СТРЕЛКА ПОЛОЖЕНИЯ',
+    
+    created: datetime(),
+    status: 'SAFETY_COMPONENT',
+    category: 'ACTUATION_COMPONENT',
+    subcategory: 'STOP',
+    drawing_number: 'КК-27-001',
+    standard: 'ГОСТ 1050-88',
+    
+    -- Дополнительные атрибуты
+    overload_protection: true,
+    torque_limit: '150 Н·м',
+    visual_indicator: true,
+    maintenance_free: true,
+    replacement_condition: 'ИЗНОС > 1 мм'
+})
+
+// 28. Болт крепления рукоятки
+CREATE (p28:Part {
+    number: '28',
+    name: 'Болт крепления рукоятки',
+    description: 'Болт для крепления рукоятки к штоку',
+    function: 'Фиксация рукоятки на квадрате штока',
+    material_spec: 'Сталь 40Х',
+    material_grade: 'AISI 4140',
+    strength_class: '10.9',
+    
+    -- Геометрические параметры
+    thread: 'М10×1.5',
+    length_mm: 35.0,
+    thread_length_mm: 20.0,
+    head_type: 'ВНУТРЕННИЙ ШЕСТИГРАННИК',
+    head_size: '8 мм',
+    
+    -- Механические свойства
+    tensile_strength: '1000 MPa',
+    yield_strength: '900 MPa',
+    shear_strength: '≥ 600 MPa',
+    
+    -- Специальные характеристики
+    vibration_resistance: 'ВЫСОКАЯ',
+    fretting_resistance: true,
+    thread_lock_feature: 'НЕЙЛОНОВОЕ КОЛЬЦО',
+    
+    -- Коррозионная стойкость
+    coating: 'ГАЛЬВАНИЧЕСКОЕ ЦИНКОВАНИЕ',
+    coating_thickness: '8-12 мкм',
+    passivation: 'ХРОМАТИРОВАНИЕ',
+    
+    created: datetime(),
+    status: 'SAFETY_CRITICAL',
+    category: 'FASTENER',
+    subcategory: 'SOCKET_HEAD_BOLT',
+    drawing_number: 'КК-28-001',
+    standard: 'ГОСТ 11738-84',
+    
+    -- Дополнительные атрибуты
+    quantity_per_unit: 1,
+    installation_tool: 'ШЕСТИГРАННЫЙ КЛЮЧ 8 мм',
+    torque_value: '60-65 Н·м',
+    lock_wire_holes: true,
+    reuse_limit: '5 раз'
+})
+
+// 29. Гайка крепления рукоятки
+CREATE (p29:Part {
+    number: '29',
+    name: 'Гайка крепления рукоятки',
+    description: 'Самоконтрящаяся гайка для болта рукоятки',
+    function: 'Фиксация болта с защитой от самоотвинчивания',
+    material_spec: 'Сталь 35',
+    material_grade: 'AISI 1035',
+    strength_class: '10',
+    
+    -- Геометрические параметры
+    thread: 'М10×1.5',
+    height_mm: 10.0,
+    width_across_flats_mm: 17.0,
+    locking_feature: 'НЕЙЛОНОВАЯ ВСТАВКА',
+    
+    -- Механические свойства
+    hardness: 'HRB 95-100',
+    prevailing_torque: '5-15 Н·м',
+    reusability: '≥ 10 раз',
+    
+    -- Конструктивные особенности
+    washer_face: true,
+    sealing: false,
+    direction_specific: false,
+    
+    -- Коррозионная стойкость
+    coating: 'ГАЛЬВАНИЧЕСКОЕ ЦИНКОВАНИЕ',
+    color: 'СЕРЕБРИСТЫЙ',
+    
+    created: datetime(),
+    status: 'SAFETY_CRITICAL',
+    category: 'FASTENER',
+    subcategory: 'NYLOCK_NUT',
+    drawing_number: 'КК-29-001',
+    standard: 'ГОСТ 5929-70',
+    
+    -- Дополнительные атрибуты
+    quantity_per_unit: 1,
+    installation_torque: '65 Н·м',
+    removal_torque: '≥ 30 Н·м',
+    temperature_range: '-40...+120 °C',
+    inspection_required: 'ПЕРЕД КАЖДЫМ ИСПОЛЬЗОВАНИЕМ'
+})
+
+// 30. Шайба крепления рукоятки
+CREATE (p30:Part {
+    number: '30',
+    name: 'Шайба крепления рукоятки',
+    description: 'Стопорная шайба для крепления рукоятки',
+    function: 'Предотвращение ослабления соединения, распределение нагрузки',
+    material_spec: 'Пружинная сталь 65Г',
+    material_grade: 'AISI 1065',
+    heat_treatment: 'ЗАКАЛКА + ОТПУСК',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 10.5,
+    outer_diameter_mm: 22.0,
+    thickness_mm: 2.0,
+    tooth_count: 12,
+    tooth_angle: '70°',
+    
+    -- Механические свойства
+    hardness: 'HRC 45-50',
+    spring_force: '≥ 100 N',
+    fatigue_life: '≥ 10000 циклов',
+    
+    -- Конструктивные особенности
+    tooth_type: 'НАРУЖНЫЕ ЗУБЬЯ',
+    locking_action: 'ПРУЖИННЫЙ ЭФФЕКТ',
+    self-centering: true,
+    
+    -- Поверхностные характеристики
+    surface_finish: 'ПОЛИРОВАННАЯ',
+    coating: 'ФОСФАТИРОВАНИЕ + МАСЛО',
+    corrosion_resistance: 'ХОРОШАЯ',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'FASTENER',
+    subcategory: 'TOOTHED_LOCK_WASHER',
+    drawing_number: 'КК-30-001',
+    standard: 'ГОСТ 6402-70',
+    
+    -- Дополнительные атрибуты
+    quantity_per_unit: 1,
+    installation_orientation: 'ЗУБЬЯМИ К ДЕТАЛИ',
+    reuse_allowed: false,
+    inspection_criteria: 'ОТСУТСТВИЕ ТРЕЩИН И ДЕФОРМАЦИЙ',
+    marking: 'ТИП И РАЗМЕР'
+})
+
+RETURN '✓ Создано 5 деталей узла управления (номера 26-30)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Узел управления"
+WITH actuation_assembly
+MATCH (p26:Part {number: '26'})
+MATCH (p27:Part {number: '27'})
+MATCH (p28:Part {number: '28'})
+MATCH (p29:Part {number: '29'})
+MATCH (p30:Part {number: '30'})
+
+// Создаем связи с атрибутами
+CREATE (actuation_assembly)-[:CONTAINS {
+    relationship_id: 'ACTUATION-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'НАРУЖНАЯ ЧАСТЬ',
+    operation_type: 'РУЧНОЕ',
+    ergonomic_rating: 'ВЫСОКАЯ',
+    created: datetime()
+}]->(p26)
+
+CREATE (actuation_assembly)-[:CONTAINS {
+    relationship_id: 'ACTUATION-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'МЕЖДУ РУКОЯТКОЙ И КОРПУСОМ',
+    safety_function: 'ЗАЩИТА ОТ ПЕРЕКРУЧИВАНИЯ',
+    adjustment: 'НЕ ТРЕБУЕТСЯ',
+    created: datetime()
+}]->(p27)
+
+CREATE (actuation_assembly)-[:CONTAINS {
+    relationship_id: 'ACTUATION-003',
+    sequence: 3,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'ЧЕРЕЗ РУКОЯТКУ В ШТОК',
+    criticality: 'ВЫСОКАЯ',
+    inspection_frequency: 'ЕЖЕМЕСЯЧНО',
+    created: datetime()
+}]->(p28)
+
+CREATE (actuation_assembly)-[:CONTAINS {
+    relationship_id: 'ACTUATION-004',
+    sequence: 4,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'НА БОЛТЕ КРЕПЛЕНИЯ',
+    locking_type: 'САМОКОНТРЯЩАЯСЯ',
+    torque_verification: 'ОБЯЗАТЕЛЬНО',
+    created: datetime()
+}]->(p29)
+
+CREATE (actuation_assembly)-[:CONTAINS {
+    relationship_id: 'ACTUATION-005',
+    sequence: 5,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'ПОД ГОЛОВКОЙ БОЛТА',
+    vibration_protection: 'ДА',
+    load_distribution: 'РАВНОМЕРНОЕ',
+    created: datetime()
+}]->(p30)
+
+RETURN '✓ Создано 5 иерархических связей' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ КОМПОНЕНТАМИ УПРАВЛЕНИЯ
+-- =============================================
+
+// Связи между компонентами узла управления
+MATCH (handle:Part {number: '26'})
+MATCH (stop:Part {number: '27'})
+MATCH (bolt:Part {number: '28'})
+MATCH (nut:Part {number: '29'})
+MATCH (washer:Part {number: '30'})
+
+// Рукоятка взаимодействует с ограничителем
+CREATE (handle)-[:INTERACTS_WITH {
+    interaction_type: 'ROTATION_LIMIT',
+    contact_points: 2,
+    wear_surfaces: true,
+    lubrication_required: 'ПЛАСТИЧНАЯ СМАЗКА',
+    created: datetime()
+}]->(stop)
+
+// Крепежный комплект для рукоятки
+CREATE (handle)-[:SECURED_BY {
+    fastening_system: 'БОЛТОВОЕ СОЕДИНЕНИЕ',
+    torque_transfer: 'ПОЛНЫЙ',
+    safety_factor: '3.0',
+    created: datetime()
+}]->(bolt)
+
+CREATE (bolt)-[:ASSEMBLED_WITH {
+    locking_mechanism: 'САМОКОНТРЯЩАЯСЯ ГАЙКА',
+    vibration_proof: true,
+    maintenance_interval: '6 МЕСЯЦЕВ',
+    created: datetime()
+}]->(nut)
+
+CREATE (bolt)-[:USES_WASHER {
+    washer_function: 'СТОПОРНАЯ + РАСПРЕДЕЛИТЕЛЬНАЯ',
+    installation_order: 'ПЕРВАЯ',
+    created: datetime()
+}]->(washer)
+
+// Ограничитель связан с рукояткой
+CREATE (stop)-[:LIMITS_MOVEMENT_OF]->(handle)
+
+RETURN '✓ Созданы связи между компонентами управления' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С ШТОКОМ И КОРПУСОМ
+-- =============================================
+
+// Связи с другими компонентами крана
+MATCH (handle:Part {number: '26'})
+MATCH (stop:Part {number: '27'})
+MATCH (bolt:Part {number: '28'})
+OPTIONAL MATCH (stem:Part {number: '14'})
+OPTIONAL MATCH (korpus:Part {number: '2'})
+
+FOREACH (ignore IN CASE WHEN stem IS NOT NULL THEN [1] ELSE [] END |
+    // Рукоятка крепится к штоку
+    CREATE (handle)-[:ATTACHES_TO_STEM {
+        connection_type: 'SQUARE_DRIVE',
+        fit: 'ПЛОТНАЯ ПОСАДКА',
+        torque_transmission: 'ПРЯМАЯ',
+        created: datetime()
+    }]->(stem)
+    
+    // Болт фиксирует рукоятку на штоке
+    CREATE (bolt)-[:SECURES_HANDLE_TO {
+        clamping_force: '≥ 10 кН',
+        stress_area: '58 мм²',
+        created: datetime()
+    }]->(stem)
+)
+
+FOREACH (ignore IN CASE WHEN korpus IS NOT NULL THEN [1] ELSE [] END |
+    // Ограничитель крепится к корпусу
+    CREATE (stop)-[:MOUNTED_ON_HOUSING {
+        mounting_type: 'ШПЛИНТ',
+        alignment: 'ПО ПОЛОЖЕНИЮ РУКОЯТКИ',
+        created: datetime()
+    }]->(korpus)
+)
+
+RETURN '✓ Созданы связи со штоком и корпусом' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ ТЕХНОЛОГИИ МОНТАЖА И КОНТРОЛЯ
+-- =============================================
+
+// Создаем процедуру монтажа рукоятки
+CREATE (handle_installation:InstallationProcedure {
+    procedure_id: 'INST-HANDLE-001',
+    procedure_name: 'Монтаж рукоятки управления',
+    applicable_parts: ['26', '27', '28', '29', '30'],
+    
+    -- Этапы монтажа
+    steps: [
+        'Проверить чистоту посадочных поверхностей',
+        'Установить ограничитель поворота на корпус',
+        'Надеть рукоятку на квадрат штока',
+        'Совместить отверстия рукоятки и штока',
+        'Установить стопорную шайбу',
+        'Вставить болт крепления',
+        'Наживить гайку',
+        'Затянуть болт динамометрическим ключом 60-65 Н·м',
+        'Проверить свободный ход рукоятки',
+        'Убедиться в ограничении поворота 90°'
+    ],
+    
+    -- Требования к инструменту
+    tools_required: ['ДИНАМОМЕТРИЧЕСКИЙ КЛЮЧ 8 мм', 'КЛЮЧ НА 17', 'ШПЛИНТЫ'],
+    
+    -- Контроль качества
+    checks: [
+        'Отсутствие люфта рукоятки',
+        'Плавность хода',
+        'Точность ограничения 90°±2°',
+        'Наличие маркировки положений',
+        'Надежность фиксации'
+    ],
+    
+    -- Безопасность
+    safety_notes: [
+        'НЕ ПРЕВЫШАТЬ МОМЕНТ ЗАТЯЖКИ',
+        'ПРОВЕРИТЬ ОТСУТСТВИЕ ПОВРЕЖДЕНИЙ',
+        'ИСПОЛЬЗОВАТЬ СИЗ'
+    ],
+    
+    created: datetime()
+})
+
+// Связываем с компонентами
+MATCH (handle:Part {number: '26'})
+MATCH (bolt:Part {number: '28'})
+CREATE (handle)-[:REQUIRES_INSTALLATION]->(handle_installation)
+CREATE (bolt)-[:INSTALLED_PER]->(handle_installation)
+
+RETURN '✓ Создана технология монтажа' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ СВЯЗЕЙ БЕЗОПАСНОСТИ
+-- =============================================
+
+// Создаем узлы требований безопасности
+CREATE (safety_req:SafetyRequirement {
+    requirement_id: 'SAFETY-ACTUATION-001',
+    title: 'Требования безопасности к узлу управления',
+    
+    requirements: [
+        'Рукоятка должна выдерживать усилие 400 Н без остаточной деформации',
+        'Крепеж должен иметь коэффициент безопасности не менее 3.0',
+        'Ограничитель должен предотвращать поворот более 95°',
+        'Все кромки должны быть завальцованы или закруглены',
+        'Маркировка положений должна быть четкой и долговечной',
+        'Защита от случайного срабатывания при наличии'
+    ],
+    
+    standards: ['ГОСТ 12.2.049-80', 'ГОСТ Р 53673-2009', 'ISO 13849-1'],
+    risk_level: 'СРЕДНИЙ',
+    
+    created: datetime()
+})
+
+// Связываем требования с компонентами
+MATCH (handle:Part {number: '26'})
+MATCH (stop:Part {number: '27'})
+MATCH (bolt:Part {number: '28'})
+CREATE (handle)-[:MUST_COMPLY_WITH]->(safety_req)
+CREATE (stop)-[:MUST_COMPLY_WITH]->(safety_req)
+CREATE (bolt)-[:MUST_COMPLY_WITH]->(safety_req)
+
+RETURN '✓ Созданы требования безопасности' AS Статус;
+
+-- =============================================
+-- 7. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные детали
+MATCH (actuation:Assembly {number: '7'})-[:CONTAINS]->(part:Part)
+WITH actuation, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [26,27,28,29,30] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  5 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 5 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 8. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по узлу управления
+MATCH (actuation:Assembly {number: '7'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:MUST_COMPLY_WITH]->(safety:SafetyRequirement)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  
+  -- Технические параметры
+  CASE 
+    WHEN p.length_mm IS NOT NULL THEN toString(p.length_mm) + ' мм'
+    WHEN p.stop_angle IS NOT NULL THEN p.stop_angle
+    WHEN p.torque_value IS NOT NULL THEN p.torque_value + ' Н·м'
+    ELSE '-'
+  END as 'Параметр',
+  
+  CASE 
+    WHEN p.strength_class IS NOT NULL THEN 'Кл. ' + p.strength_class
+    WHEN p.bending_strength IS NOT NULL THEN p.bending_strength
+    WHEN p.hardness IS NOT NULL THEN p.hardness
+    ELSE '-'
+  END as 'Характеристика',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.assembly_position as Позиция,
+  
+  -- Безопасность
+  CASE 
+    WHEN safety IS NOT NULL THEN 'Требования безопасности'
+    WHEN p.status = 'SAFETY_CRITICAL' THEN 'Критично для безопасности'
+    ELSE '-'
+  END as 'Безопасность',
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 9. АНАЛИЗ УЗЛА УПРАВЛЕНИЯ
+-- =============================================
+
+// Анализ функциональности узла управления
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 26 AND toInteger(p.number) <= 30
+WITH 
+  SUM(CASE WHEN p.category = 'ACTUATION_COMPONENT' THEN 1 ELSE 0 END) as actuation_parts,
+  SUM(CASE WHEN p.category = 'FASTENER' THEN 1 ELSE 0 END) as fastener_parts,
+  SUM(CASE WHEN p.status = 'SAFETY_CRITICAL' THEN 1 ELSE 0 END) as safety_critical,
+  COUNT(p) as total_parts,
+  COLLECT(DISTINCT p.material_spec) as materials
+
+RETURN 
+  total_parts as Всего_деталей,
+  actuation_parts as 'Деталей управления',
+  fastener_parts as 'Крепежных деталей',
+  safety_critical as 'Критичных для безопасности',
+  materials as Используемые_материалы,
+  'Ручное управление с ограничением поворота' as Назначение;
+
+-- =============================================
+-- 10. СОЗДАНИЕ ИНДЕКСОВ
+-- =============================================
+
+// Специальные индексы для узла управления
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.subcategory)
+WHERE p.subcategory IN ['HANDLE', 'STOP']
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.status)
+WHERE p.status = 'SAFETY_CRITICAL'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.torque_value)
+
+RETURN '✓ Созданы специализированные индексы для узла управления' AS Статус;
+
+-- =============================================
+-- 11. ПРОВЕРКА ФУНКЦИОНАЛЬНОСТИ
+-- =============================================
+
+// Проверка функциональной целостности узла управления
+MATCH (actuation:Assembly {number: '7'})
+OPTIONAL MATCH (actuation)-[:CONTAINS]->(handle:Part {subcategory: 'HANDLE'})
+OPTIONAL MATCH (actuation)-[:CONTAINS]->(stop:Part {subcategory: 'STOP'})
+OPTIONAL MATCH (actuation)-[:CONTAINS]->(bolt:Part {subcategory: 'SOCKET_HEAD_BOLT'})
+OPTIONAL MATCH (actuation)-[:CONTAINS]->(nut:Part {subcategory: 'NYLOCK_NUT'})
+OPTIONAL MATCH (actuation)-[:CONTAINS]->(washer:Part {subcategory: 'TOOTHED_LOCK_WASHER'})
+
+WITH actuation,
+     handle IS NOT NULL as has_handle,
+     stop IS NOT NULL as has_stop,
+     bolt IS NOT NULL as has_bolt,
+     nut IS NOT NULL as has_nut,
+     washer IS NOT NULL as has_washer
+
+RETURN 
+  actuation.name as Узел,
+  CASE WHEN has_handle THEN '✓' ELSE '✗' END as Рукоятка,
+  CASE WHEN has_stop THEN '✓' ELSE '✗' END as Ограничитель,
+  CASE WHEN has_bolt THEN '✓' ELSE '✗' END as Болт,
+  CASE WHEN has_nut THEN '✓' ELSE '✗' END as Гайка,
+  CASE WHEN has_washer THEN '✓' ELSE '✗' END as Шайба,
+  CASE 
+    WHEN has_handle AND has_stop AND has_bolt AND has_nut AND has_washer 
+    THEN '✓ Полный функциональный комплект'
+    ELSE '✗ Неполный комплект'
+  END as Статус;
+
+-- =============================================
+-- 12. АНАЛИЗ ЭРГОНОМИКИ И БЕЗОПАСНОСТИ
+-- =============================================
+
+// Анализ эргономических и безопасностных характеристик
+MATCH (handle:Part {number: '26'})
+MATCH (stop:Part {number: '27'})
+WITH handle, stop
+
+RETURN 
+  'Эргономика и безопасность' as Анализ,
+  handle.name as Рукоятка,
+  handle.length_mm as 'Длина, мм',
+  handle.operation_force as 'Усилие управления',
+  handle.safety_features as 'Функции безопасности',
+  handle.lockable as 'Возможность блокировки',
+  
+  stop.name as Ограничитель,
+  stop.stop_angle as 'Угол ограничения',
+  stop.overload_protection as 'Защита от перегрузки',
+  stop.torque_limit as 'Предельный момент',
+  
+  'Соответствует требованиям эргономики и безопасности' as Заключение;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 08 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

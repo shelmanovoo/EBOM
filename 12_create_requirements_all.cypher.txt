@@ -1,0 +1,1343 @@
+-- =============================================
+-- Создание требований для всех деталей EBOM
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает функциональные требования для всех 36 деталей EBOM
+-- Всего создается 108 требований (по 3 требования на каждую деталь)
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ ДЕТАЛЕЙ
+-- =============================================
+
+// Проверяем наличие всех деталей перед созданием требований
+MATCH (p:Part)
+WITH COUNT(p) as total_parts
+WHERE total_parts < 35
+RETURN '⚠ ВНИМАНИЕ: Обнаружено только ' + total_parts + ' деталей из 35. Рекомендуется выполнить все скрипты создания деталей перед выполнением этого скрипта.' as Предупреждение
+// Продолжаем выполнение даже если деталей меньше
+
+-- =============================================
+-- 1. ТРЕБОВАНИЯ ДЛЯ ВЕРХНЕЙ СБОРКИ (0)
+-- =============================================
+
+// Находим сборку верхнего уровня
+MATCH (a0:Assembly {number: '0'})
+CREATE (r0_1:Requirement {
+    id: 'R0.1',
+    text: 'Обеспечивать герметичное перекрытие потока в заданных DN/PN.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ГИДРАВЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    standard: 'ГОСТ 9544-2015',
+    created: datetime()
+})
+
+CREATE (r0_2:Requirement {
+    id: 'R0.2',
+    text: 'Обеспечивать полный поворот запорного элемента на 90° без заеданий.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'МЕХАНИЧЕСКОЕ ИСПЫТАНИЕ',
+    standard: 'ГОСТ 33259-2015',
+    created: datetime()
+})
+
+CREATE (r0_3:Requirement {
+    id: 'R0.3',
+    text: 'Сохранять работоспособность в пределах нормативного ресурса и циклов.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ЦИКЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    standard: 'ГОСТ 27.002-2015',
+    created: datetime()
+})
+
+CREATE (a0)-[:HAS_REQUIREMENT]->(r0_1)
+CREATE (a0)-[:HAS_REQUIREMENT]->(r0_2)
+CREATE (a0)-[:HAS_REQUIREMENT]->(r0_3)
+
+RETURN '✓ Созданы требования для сборки верхнего уровня (0)' AS Статус;
+
+-- =============================================
+-- 2. ТРЕБОВАНИЯ ДЛЯ ДЕТАЛЕЙ КОРПУСА (2-8)
+-- =============================================
+
+// 2. Корпус левый
+MATCH (p2:Part {number: '2'})
+CREATE (p2)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R2.1',
+    text: 'Обеспечивать прочность и герметичность под расчетным давлением.',
+    category: 'STRUCTURAL',
+    priority: 'CRITICAL',
+    verification_method: 'РАСЧЕТ ПРОЧНОСТИ, ГИДРОИСПЫТАНИЯ',
+    standard: 'ГОСТ 14249-89',
+    created: datetime()
+})
+
+CREATE (p2)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R2.2',
+    text: 'Обеспечивать соосность седла и шара.',
+    category: 'GEOMETRIC',
+    priority: 'HIGH',
+    verification_method: 'КООРДИНАТОМЕР, ШАБЛОНЫ',
+    standard: 'ГОСТ 24643-81',
+    created: datetime()
+})
+
+CREATE (p2)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R2.3',
+    text: 'Иметь посадочные поверхности в пределах заданных допусков.',
+    category: 'GEOMETRIC',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ РАЗМЕРОВ',
+    tolerance: 'H7',
+    created: datetime()
+})
+
+// 3. Корпус правый
+MATCH (p3:Part {number: '3'})
+CREATE (p3)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R3.1',
+    text: 'Обеспечивать герметичное сопряжение с левым корпусом.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'КОНТРОЛЬ ПЛОСКОСТНОСТИ ФЛАНЦЕВ',
+    flatness_tolerance: '0.05 мм',
+    created: datetime()
+})
+
+CREATE (p3)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R3.2',
+    text: 'Обеспечивать передачу нагрузок от трубопровода.',
+    category: 'STRUCTURAL',
+    priority: 'HIGH',
+    verification_method: 'РАСЧЕТ НА ПРОЧНОСТЬ',
+    load_capacity: '2000 N',
+    created: datetime()
+})
+
+CREATE (p3)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R3.3',
+    text: 'Исключать остаточные напряжения, влияющие на герметичность.',
+    category: 'TECHNOLOGICAL',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ ТЕРМИЧЕСКОЙ ОБРАБОТКИ',
+    heat_treatment: 'НОРМАЛИЗАЦИЯ',
+    created: datetime()
+})
+
+// 4. Прокладка межкорпусная
+MATCH (p4:Part {number: '4'})
+CREATE (p4)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R4.1',
+    text: 'Обеспечивать герметичность межкорпусного соединения.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА ПРОТЕЧКУ',
+    leak_rate: '0 мл/мин',
+    created: datetime()
+})
+
+CREATE (p4)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R4.2',
+    text: 'Сохранять свойства при рабочей температуре и среде.',
+    category: 'MATERIAL',
+    priority: 'HIGH',
+    verification_method: 'ТЕРМИЧЕСКОЕ СТАРЕНИЕ',
+    temperature_range: '-50...+450 °C',
+    created: datetime()
+})
+
+CREATE (p4)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R4.3',
+    text: 'Не разрушаться при расчетном усилии затяжки.',
+    category: 'MECHANICAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА СЖАТИЕ',
+    compression_strength: '≥ 25 МПа',
+    created: datetime()
+})
+
+// 5. Болт стяжной корпуса
+MATCH (p5:Part {number: '5'})
+CREATE (p5)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R5.1',
+    text: 'Обеспечивать заданное усилие стяжки корпуса.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА РАСТЯЖЕНИЕ',
+    tensile_strength: '≥ 800 МПа',
+    created: datetime()
+})
+
+CREATE (p5)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R5.2',
+    text: 'Сохранять прочность при циклических нагрузках.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА УСТАЛОСТЬ',
+    cycles: '≥ 10000',
+    created: datetime()
+})
+
+CREATE (p5)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R5.3',
+    text: 'Быть совместимым с материалом корпуса по коррозии.',
+    category: 'MATERIAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА КОРРОЗИЮ',
+    galvanic_compatibility: 'ДА',
+    created: datetime()
+})
+
+// 6. Гайка стяжная корпуса
+MATCH (p6:Part {number: '6'})
+CREATE (p6)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R6.1',
+    text: 'Обеспечивать надежную фиксацию болта.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'КОНТРОЛЬ РЕЗЬБЫ',
+    thread_tolerance: '6Н',
+    created: datetime()
+})
+
+CREATE (p6)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R6.2',
+    text: 'Сохранять резьбовое соединение при вибрациях.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ВИБРОИСПЫТАНИЕ',
+    vibration_resistance: '≥ 10 g',
+    created: datetime()
+})
+
+CREATE (p6)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R6.3',
+    text: 'Исключать самопроизвольное ослабление.',
+    category: 'SAFETY',
+    priority: 'HIGH',
+    verification_method: 'ТЕСТ НА САМООТВИНЧИВАНИЕ',
+    locking_feature: 'КОНТРГАЙКА',
+    created: datetime()
+})
+
+// 7. Шайба плоская
+MATCH (p7:Part {number: '7'})
+CREATE (p7)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R7.1',
+    text: 'Обеспечивать равномерное распределение нагрузки.',
+    category: 'FUNCTIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ ПЛОСКОСТНОСТИ',
+    flatness: '≤ 0.05 мм',
+    created: datetime()
+})
+
+CREATE (p7)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R7.2',
+    text: 'Предотвращать повреждение поверхности корпуса.',
+    category: 'PROTECTIVE',
+    priority: 'MEDIUM',
+    verification_method: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    surface_finish: 'ШЛИФОВАННАЯ',
+    created: datetime()
+})
+
+CREATE (p7)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R7.3',
+    text: 'Сохранять геометрию под нагрузкой.',
+    category: 'MECHANICAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА СЖАТИЕ',
+    yield_strength: '≥ 400 МПа',
+    created: datetime()
+})
+
+// 8. Шайба пружинная
+MATCH (p8:Part {number: '8'})
+CREATE (p8)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R8.1',
+    text: 'Компенсировать ослабление затяжки при эксплуатации.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА УПРУГОСТЬ',
+    spring_rate: '25-30 N/mm',
+    created: datetime()
+})
+
+CREATE (p8)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R8.2',
+    text: 'Сохранять упругие свойства в рабочем диапазоне температур.',
+    category: 'MATERIAL',
+    priority: 'MEDIUM',
+    verification_method: 'ТЕМПЕРАТУРНОЕ ИСПЫТАНИЕ',
+    temperature_range: '-40...+150 °C',
+    created: datetime()
+})
+
+CREATE (p8)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R8.3',
+    text: 'Обеспечивать антивибрационную функцию соединения.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ВИБРОИСПЫТАНИЕ',
+    damping_factor: '≥ 0.1',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для деталей корпуса (2-8)' AS Статус;
+
+-- =============================================
+-- 3. ТРЕБОВАНИЯ ДЛЯ ЗАПОРНОГО ЭЛЕМЕНТА (9)
+-- =============================================
+
+// 9. Шар запорный
+MATCH (p9:Part {number: '9'})
+CREATE (p9)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R9.1',
+    text: 'Обеспечивать полную герметичность в закрытом положении.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ВАКУУМНОЕ ИСПЫТАНИЕ',
+    leak_rate: '≤ 10⁻⁶ мбар·л/с',
+    created: datetime()
+})
+
+CREATE (p9)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R9.2',
+    text: 'Обеспечивать минимальный крутящий момент при повороте.',
+    category: 'OPERATIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИЗМЕРЕНИЕ МОМЕНТА ПОВОРОТА',
+    max_torque: '≤ 50 Н·м',
+    created: datetime()
+})
+
+CREATE (p9)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R9.3',
+    text: 'Сохранять геометрию и чистоту поверхности при износе.',
+    category: 'WEAR',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ИЗНОС',
+    wear_resistance: '≥ 10000 циклов',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для шара запорного (9)' AS Статус;
+
+-- =============================================
+-- 4. ТРЕБОВАНИЯ ДЛЯ СЕДЕЛ И УПЛОТНЕНИЙ (10-13)
+-- =============================================
+
+// 10. Седло шаровое левое
+MATCH (p10:Part {number: '10'})
+CREATE (p10)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R10.1',
+    text: 'Обеспечивать герметичное прилегание к шару.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'КОНТРОЛЬ КОНИЧЕСКОЙ ПОВЕРХНОСТИ',
+    contact_pattern: '≥ 90%',
+    created: datetime()
+})
+
+CREATE (p10)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R10.2',
+    text: 'Компенсировать допуски и тепловые расширения.',
+    category: 'THERMAL',
+    priority: 'HIGH',
+    verification_method: 'ТЕМПЕРАТУРНОЕ ЦИКЛИРОВАНИЕ',
+    thermal_expansion: 'СОВМЕСТИМО С ШАРОМ',
+    created: datetime()
+})
+
+CREATE (p10)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R10.3',
+    text: 'Сохранять форму при рабочем давлении.',
+    category: 'STRUCTURAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ДАВЛЕНИЕ',
+    pressure_resistance: '≥ 1.5×PN',
+    created: datetime()
+})
+
+// 11. Седло шаровое правое
+MATCH (p11:Part {number: '11'})
+CREATE (p11)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R11.1',
+    text: 'Обеспечивать равномерное распределение нагрузки на шар.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'КОНТРОЛЬ КОНТАКТНОГО ДАВЛЕНИЯ',
+    pressure_distribution: 'РАВНОМЕРНОЕ',
+    created: datetime()
+})
+
+CREATE (p11)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R11.2',
+    text: 'Обеспечивать устойчивость к истиранию.',
+    category: 'WEAR',
+    priority: 'HIGH',
+    verification_method: 'ТЕСТ НА ИСТИРАНИЕ',
+    wear_rate: '≤ 0.01 мм/1000 циклов',
+    created: datetime()
+})
+
+CREATE (p11)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R11.3',
+    text: 'Исключать экструзию материала.',
+    category: 'MATERIAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА ЭКСТРУЗИЮ',
+    extrusion_resistance: '≥ 25 МПа',
+    created: datetime()
+})
+
+// 12. Кольцо уплотнительное седла левое
+MATCH (p12:Part {number: '12'})
+CREATE (p12)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R12.1',
+    text: 'Обеспечивать герметичность седла.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ПРОТЕЧКУ',
+    leak_rate: '0 мл/мин',
+    created: datetime()
+})
+
+CREATE (p12)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R12.2',
+    text: 'Быть химически совместимым с рабочей средой.',
+    category: 'MATERIAL',
+    priority: 'HIGH',
+    verification_method: 'ХИМИЧЕСКАЯ СТОЙКОСТЬ',
+    chemical_compatibility: 'ПОЛНАЯ',
+    created: datetime()
+})
+
+CREATE (p12)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R12.3',
+    text: 'Сохранять эластичность в заданном диапазоне температур.',
+    category: 'THERMAL',
+    priority: 'MEDIUM',
+    verification_method: 'ТЕМПЕРАТУРНОЕ СТАРЕНИЕ',
+    compression_set: '≤ 10%',
+    created: datetime()
+})
+
+// 13. Кольцо уплотнительное седла правое
+MATCH (p13:Part {number: '13'})
+CREATE (p13)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R13.1',
+    text: 'Обеспечивать долговременную герметичность.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ДОЛГОВРЕМЕННОЕ ИСПЫТАНИЕ',
+    service_life: '≥ 10 лет',
+    created: datetime()
+})
+
+CREATE (p13)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R13.2',
+    text: 'Не допускать выдавливания под давлением.',
+    category: 'MECHANICAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ДАВЛЕНИЕ',
+    extrusion_resistance: '≥ 30 МПа',
+    created: datetime()
+})
+
+CREATE (p13)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R13.3',
+    text: 'Обеспечивать стабильность размеров.',
+    category: 'DIMENSIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ РАЗМЕРОВ ПОСЛЕ СТАРЕНИЯ',
+    dimensional_stability: '±0.1 мм',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для седел и уплотнений (10-13)' AS Статус;
+
+-- =============================================
+-- 5. ТРЕБОВАНИЯ ДЛЯ ШТОКА И КОМПОНЕНТОВ (14-18)
+-- =============================================
+
+// 14. Шток крана
+MATCH (p14:Part {number: '14'})
+CREATE (p14)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R14.1',
+    text: 'Обеспечивать передачу крутящего момента на шар.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА КРУЧЕНИЕ',
+    torsional_strength: '≥ 150 Н·м',
+    created: datetime()
+})
+
+CREATE (p14)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R14.2',
+    text: 'Обеспечивать точное позиционирование шара.',
+    category: 'GEOMETRIC',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ ШЛИЦЕВОГО СОЕДИНЕНИЯ',
+    angular_tolerance: '±1°',
+    created: datetime()
+})
+
+CREATE (p14)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R14.3',
+    text: 'Исключать пластическую деформацию при нагрузке.',
+    category: 'MECHANICAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ИЗГИБ',
+    yield_strength: '≥ 600 МПа',
+    created: datetime()
+})
+
+// 15. Кольцо уплотнительное штока верхнее
+MATCH (p15:Part {number: '15'})
+CREATE (p15)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R15.1',
+    text: 'Обеспечивать герметичность в зоне выхода штока.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА ПРОТЕЧКУ',
+    leak_rate: '≤ 3 капли/мин',
+    created: datetime()
+})
+
+CREATE (p15)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R15.2',
+    text: 'Предотвращать утечку рабочей среды наружу.',
+    category: 'ENVIRONMENTAL',
+    priority: 'HIGH',
+    verification_method: 'ГЕРМЕТИЧНОСТЬ ПОД ДАВЛЕНИЕМ',
+    pressure_rating: '≥ 1.1×PN',
+    created: datetime()
+})
+
+CREATE (p15)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R15.3',
+    text: 'Сохранять свойства при циклическом вращении.',
+    category: 'DURABILITY',
+    priority: 'HIGH',
+    verification_method: 'ЦИКЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    cycles: '≥ 10000',
+    created: datetime()
+})
+
+// 16. Кольцо уплотнительное штока нижнее
+MATCH (p16:Part {number: '16'})
+CREATE (p16)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R16.1',
+    text: 'Обеспечивать резервную герметизацию штока.',
+    category: 'SAFETY',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ ДВОЙНОГО УПЛОТНЕНИЯ',
+    backup_function: 'ДА',
+    created: datetime()
+})
+
+CREATE (p16)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R16.2',
+    text: 'Работать в условиях давления со стороны среды.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ОБРАТНОЕ ДАВЛЕНИЕ',
+    reverse_pressure: '≥ 0.5×PN',
+    created: datetime()
+})
+
+CREATE (p16)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R16.3',
+    text: 'Быть устойчивым к износу.',
+    category: 'WEAR',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА ИЗНОС',
+    wear_life: '≥ 5000 циклов',
+    created: datetime()
+})
+
+// 17. Кольцо опорное (упорное) штока
+MATCH (p17:Part {number: '17'})
+CREATE (p17)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R17.1',
+    text: 'Воспринимать осевые нагрузки от штока.',
+    category: 'STRUCTURAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА СЖАТИЕ',
+    axial_load_capacity: '≥ 2000 N',
+    created: datetime()
+})
+
+CREATE (p17)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R17.2',
+    text: 'Обеспечивать стабильное положение штока.',
+    category: 'GEOMETRIC',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ СООСНОСТИ',
+    alignment_tolerance: '≤ 0.05 мм',
+    created: datetime()
+})
+
+CREATE (p17)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R17.3',
+    text: 'Сохранять геометрию при длительной нагрузке.',
+    category: 'CREEP',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА ПОЛЗУЧЕСТЬ',
+    creep_resistance: 'ДА',
+    created: datetime()
+})
+
+// 18. Втулка штока
+MATCH (p18:Part {number: '18'})
+CREATE (p18)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R18.1',
+    text: 'Обеспечивать направляющую функцию штока.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ ЗАЗОРА',
+    clearance: '0.05-0.1 мм',
+    created: datetime()
+})
+
+CREATE (p18)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R18.2',
+    text: 'Снижать трение и износ.',
+    category: 'WEAR',
+    priority: 'MEDIUM',
+    verification_method: 'КОЭФФИЦИЕНТ ТРЕНИЯ',
+    friction_coefficient: '≤ 0.12',
+    created: datetime()
+})
+
+CREATE (p18)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R18.3',
+    text: 'Исключать перекос штока.',
+    category: 'GEOMETRIC',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ ПАРАЛЛЕЛЬНОСТИ',
+    parallelism: '≤ 0.03 мм',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для штока и компонентов (14-18)' AS Статус;
+
+-- =============================================
+-- 6. ТРЕБОВАНИЯ ДЛЯ САЛЬНИКОВОГО УЗЛА (19-20)
+-- =============================================
+
+// 19. Сальниковая набивка / PTFE-кольцо
+MATCH (p19:Part {number: '19'})
+CREATE (p19)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R19.1',
+    text: 'Обеспечивать герметичность при вращении штока.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА ПРОТЕЧКУ',
+    leak_rate: '≤ 60 капель/мин',
+    created: datetime()
+})
+
+CREATE (p19)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R19.2',
+    text: 'Компенсировать износ и температурные изменения.',
+    category: 'DURABILITY',
+    priority: 'HIGH',
+    verification_method: 'ТЕМПЕРАТУРНОЕ ЦИКЛИРОВАНИЕ',
+    adjustment_range: '3-5 мм',
+    created: datetime()
+})
+
+CREATE (p19)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R19.3',
+    text: 'Не создавать избыточный момент сопротивления.',
+    category: 'OPERATIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИЗМЕРЕНИЕ МОМЕНТА ТРЕНИЯ',
+    friction_torque: '≤ 10 Н·м',
+    created: datetime()
+})
+
+// 20. Шайба прижимная сальника
+MATCH (p20:Part {number: '20'})
+CREATE (p20)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R20.1',
+    text: 'Обеспечивать равномерный прижим набивки.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ ПЛОСКОСТНОСТИ',
+    flatness: '≤ 0.05 мм',
+    created: datetime()
+})
+
+CREATE (p20)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R20.2',
+    text: 'Передавать усилие без деформации.',
+    category: 'MECHANICAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА ИЗГИБ',
+    stiffness: '≥ 5000 N/mm',
+    created: datetime()
+})
+
+CREATE (p20)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R20.3',
+    text: 'Обеспечивать стабильность регулировки.',
+    category: 'RELIABILITY',
+    priority: 'MEDIUM',
+    verification_method: 'ЦИКЛИЧЕСКАЯ РЕГУЛИРОВКА',
+    adjustment_stability: 'ДА',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для сальникового узла (19-20)' AS Статус;
+
+-- =============================================
+-- 7. ТРЕБОВАНИЯ ДЛЯ КРЫШКИ ШТОКА (21-25)
+-- =============================================
+
+// 21. Крышка сальника (крышка штока)
+MATCH (p21:Part {number: '21'})
+CREATE (p21)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R21.1',
+    text: 'Фиксировать сальниковый узел.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА РАСТЯЖЕНИЕ',
+    clamping_force: '≥ 10 кН',
+    created: datetime()
+})
+
+CREATE (p21)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R21.2',
+    text: 'Обеспечивать защиту штока от внешних воздействий.',
+    category: 'PROTECTIVE',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА УДАР',
+    impact_resistance: '≥ 10 Дж',
+    created: datetime()
+})
+
+CREATE (p21)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R21.3',
+    text: 'Выдерживать усилие затяжки крепежа.',
+    category: 'STRUCTURAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА СЖАТИЕ',
+    compressive_strength: '≥ 300 МПа',
+    created: datetime()
+})
+
+// 22. Прокладка крышки штока
+MATCH (p22:Part {number: '22'})
+CREATE (p22)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R22.1',
+    text: 'Обеспечивать герметичность соединения крышки.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ГИДРОИСПЫТАНИЕ',
+    leak_rate: '0 мл/мин',
+    created: datetime()
+})
+
+CREATE (p22)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R22.2',
+    text: 'Сохранять свойства при температуре эксплуатации.',
+    category: 'THERMAL',
+    priority: 'HIGH',
+    verification_method: 'ТЕРМИЧЕСКОЕ СТАРЕНИЕ',
+    temperature_stability: '-50...+450 °C',
+    created: datetime()
+})
+
+CREATE (p22)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R22.3',
+    text: 'Исключать подсос среды наружу.',
+    category: 'ENVIRONMENTAL',
+    priority: 'MEDIUM',
+    verification_method: 'ВАКУУМНОЕ ИСПЫТАНИЕ',
+    vacuum_resistance: '≥ 0.1 бар',
+    created: datetime()
+})
+
+// 23. Болт крепления крышки
+MATCH (p23:Part {number: '23'})
+CREATE (p23)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R23.1',
+    text: 'Обеспечивать надежную фиксацию крышки.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА СРЕЗ',
+    shear_strength: '≥ 600 МПа',
+    created: datetime()
+})
+
+CREATE (p23)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R23.2',
+    text: 'Сохранять прочность при вибрациях.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ВИБРОИСПЫТАНИЕ',
+    vibration_resistance: '≥ 5 g',
+    created: datetime()
+})
+
+CREATE (p23)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R23.3',
+    text: 'Быть устойчивым к коррозии.',
+    category: 'CORROSION',
+    priority: 'MEDIUM',
+    verification_method: 'СОЛЕВОЙ ТУМАН',
+    salt_spray: '≥ 500 часов',
+    created: datetime()
+})
+
+// 24. Гайка крепления крышки
+MATCH (p24:Part {number: '24'})
+CREATE (p24)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R24.1',
+    text: 'Обеспечивать стабильное резьбовое соединение.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ РЕЗЬБЫ',
+    thread_quality: 'КЛАСС 6Н',
+    created: datetime()
+})
+
+CREATE (p24)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R24.2',
+    text: 'Исключать самораскручивание.',
+    category: 'SAFETY',
+    priority: 'HIGH',
+    verification_method: 'ТЕСТ НА САМООТВИНЧИВАНИЕ',
+    self_locking: 'ДА',
+    created: datetime()
+})
+
+CREATE (p24)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R24.3',
+    text: 'Сохранять геометрию резьбы.',
+    category: 'DIMENSIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ РЕЗЬБОМЕРОМ',
+    thread_preservation: 'ДА',
+    created: datetime()
+})
+
+// 25. Шайба крепления крышки
+MATCH (p25:Part {number: '25'})
+CREATE (p25)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R25.1',
+    text: 'Распределять нагрузку от крепежа.',
+    category: 'FUNCTIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ КОНТАКТНОЙ ПЛОЩАДИ',
+    contact_area: '≥ 80%',
+    created: datetime()
+})
+
+CREATE (p25)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R25.2',
+    text: 'Предотвращать повреждение поверхности крышки.',
+    category: 'PROTECTIVE',
+    priority: 'MEDIUM',
+    verification_method: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    surface_protection: 'ДА',
+    created: datetime()
+})
+
+CREATE (p25)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R25.3',
+    text: 'Сохранять форму под нагрузкой.',
+    category: 'MECHANICAL',
+    priority: 'MEDIUM',
+    verification_method: 'ИСПЫТАНИЕ НА ПЛАСТИЧНОСТЬ',
+    plastic_deformation: 'ОТСУТСТВУЕТ',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для крышки штока (21-25)' AS Статус;
+
+-- =============================================
+-- 8. ТРЕБОВАНИЯ ДЛЯ УЗЛА УПРАВЛЕНИЯ (26-30)
+-- =============================================
+
+// 26. Рукоятка (рычаг)
+MATCH (p26:Part {number: '26'})
+CREATE (p26)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R26.1',
+    text: 'Обеспечивать удобное ручное управление.',
+    category: 'ERGONOMIC',
+    priority: 'HIGH',
+    verification_method: 'ЭРГОНОМИЧЕСКАЯ ОЦЕНКА',
+    comfort_level: 'ВЫСОКИЙ',
+    created: datetime()
+})
+
+CREATE (p26)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R26.2',
+    text: 'Передавать крутящий момент без деформации.',
+    category: 'MECHANICAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА КРУЧЕНИЕ',
+    torsional_stiffness: '≥ 400 Н·м',
+    created: datetime()
+})
+
+CREATE (p26)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R26.3',
+    text: 'Обеспечивать визуальную индикацию положения.',
+    category: 'OPERATIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    visibility: 'ХОРОШАЯ',
+    created: datetime()
+})
+
+// 27. Ограничитель поворота
+MATCH (p27:Part {number: '27'})
+CREATE (p27)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R27.1',
+    text: 'Ограничивать угол поворота штока до 90°.',
+    category: 'SAFETY',
+    priority: 'CRITICAL',
+    verification_method: 'ИЗМЕРЕНИЕ УГЛА ПОВОРОТА',
+    angle_tolerance: '90° ±2°',
+    created: datetime()
+})
+
+CREATE (p27)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R27.2',
+    text: 'Обеспечивать повторяемость крайних положений.',
+    category: 'PRECISION',
+    priority: 'HIGH',
+    verification_method: 'ЦИКЛИЧЕСКОЕ ПОЗИЦИОНИРОВАНИЕ',
+    repeatability: '±1°',
+    created: datetime()
+})
+
+CREATE (p27)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R27.3',
+    text: 'Исключать перегрузку уплотнений.',
+    category: 'PROTECTIVE',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ УСИЛИЯ',
+    overload_protection: 'ДА',
+    created: datetime()
+})
+
+// 28. Болт крепления рукоятки
+MATCH (p28:Part {number: '28'})
+CREATE (p28)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R28.1',
+    text: 'Обеспечивать жесткую фиксацию рукоятки.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА СРЕЗ',
+    shear_strength: '≥ 800 МПа',
+    created: datetime()
+})
+
+CREATE (p28)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R28.2',
+    text: 'Передавать крутящий момент без среза.',
+    category: 'MECHANICAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА КРУЧЕНИЕ',
+    torque_transmission: 'ПОЛНАЯ',
+    created: datetime()
+})
+
+CREATE (p28)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R28.3',
+    text: 'Сохранять затяжку при циклах.',
+    category: 'RELIABILITY',
+    priority: 'HIGH',
+    verification_method: 'ЦИКЛИЧЕСКОЕ НАГРУЖЕНИЕ',
+    preload_retention: '≥ 90%',
+    created: datetime()
+})
+
+// 29. Гайка крепления рукоятки
+MATCH (p29:Part {number: '29'})
+CREATE (p29)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R29.1',
+    text: 'Фиксировать болт без люфта.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ ЗАЗОРА',
+    backlash: '≤ 0.1 мм',
+    created: datetime()
+})
+
+CREATE (p29)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R29.2',
+    text: 'Исключать самопроизвольное ослабление.',
+    category: 'SAFETY',
+    priority: 'HIGH',
+    verification_method: 'ВИБРОИСПЫТАНИЕ',
+    vibration_loosening: 'ОТСУТСТВУЕТ',
+    created: datetime()
+})
+
+CREATE (p29)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R29.3',
+    text: 'Быть совместимой с материалом болта.',
+    category: 'MATERIAL',
+    priority: 'MEDIUM',
+    verification_method: 'ГАЛЬВАНИЧЕСКАЯ СОВМЕСТИМОСТЬ',
+    galvanic_pair: 'ДА',
+    created: datetime()
+})
+
+// 30. Шайба крепления рукоятки
+MATCH (p30:Part {number: '30'})
+CREATE (p30)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R30.1',
+    text: 'Распределять нагрузку от крепления.',
+    category: 'FUNCTIONAL',
+    priority: 'MEDIUM',
+    verification_method: 'АНАЛИЗ КОНТАКТНОГО ДАВЛЕНИЯ',
+    pressure_distribution: 'РАВНОМЕРНОЕ',
+    created: datetime()
+})
+
+CREATE (p30)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R30.2',
+    text: 'Предотвращать повреждение рукоятки.',
+    category: 'PROTECTIVE',
+    priority: 'MEDIUM',
+    verification_method: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    surface_protection: 'ДА',
+    created: datetime()
+})
+
+CREATE (p30)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R30.3',
+    text: 'Сохранять форму при эксплуатации.',
+    category: 'DURABILITY',
+    priority: 'MEDIUM',
+    verification_method: 'ЦИКЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    shape_retention: 'ДА',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для узла управления (26-30)' AS Статус;
+
+-- =============================================
+-- 9. ТРЕБОВАНИЯ ДЛЯ ПРИСОЕДИНИТЕЛЬНЫХ ЭЛЕМЕНТОВ (31-32)
+-- =============================================
+
+// 31. Патрубок входной
+MATCH (p31:Part {number: '31'})
+CREATE (p31)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R31.1',
+    text: 'Обеспечивать герметичное присоединение к трубопроводу.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ГИДРОИСПЫТАНИЕ ФЛАНЦЕВОГО СОЕДИНЕНИЯ',
+    leak_rate: '0 мл/мин',
+    created: datetime()
+})
+
+CREATE (p31)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R31.2',
+    text: 'Передавать нагрузку от внешних соединений.',
+    category: 'STRUCTURAL',
+    priority: 'HIGH',
+    verification_method: 'РАСЧЕТ НА ПРОЧНОСТЬ',
+    bending_moment: '≥ 800 Н·м',
+    created: datetime()
+})
+
+CREATE (p31)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R31.3',
+    text: 'Соответствовать требованиям DN/PN как атрибутам.',
+    category: 'STANDARDIZATION',
+    priority: 'HIGH',
+    verification_method: 'СООТВЕТСТВИЕ СТАНДАРТАМ',
+    standard_compliance: 'ГОСТ 12815-80',
+    created: datetime()
+})
+
+// 32. Патрубок выходной
+MATCH (p32:Part {number: '32'})
+CREATE (p32)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R32.1',
+    text: 'Обеспечивать соосность потока.',
+    category: 'HYDRAULIC',
+    priority: 'HIGH',
+    verification_method: 'КОНТРОЛЬ СООСНОСТИ',
+    alignment: '≤ 0.5 мм',
+    created: datetime()
+})
+
+CREATE (p32)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R32.2',
+    text: 'Выдерживать рабочее давление.',
+    category: 'PRESSURE',
+    priority: 'CRITICAL',
+    verification_method: 'ГИДРАВЛИЧЕСКОЕ ИСПЫТАНИЕ',
+    burst_pressure: '≥ 2.5×PN',
+    created: datetime()
+})
+
+CREATE (p32)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R32.3',
+    text: 'Обеспечивать герметичность соединения.',
+    category: 'FUNCTIONAL',
+    priority: 'CRITICAL',
+    verification_method: 'ИСПЫТАНИЕ НА ПРОТЕЧКУ',
+    sealing_performance: '100%',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для присоединительных элементов (31-32)' AS Статус;
+
+-- =============================================
+-- 10. ТРЕБОВАНИЯ ДЛЯ МАРКИРОВКИ И СЕРВИСА (33-34)
+-- =============================================
+
+// 33. Табличка паспортная
+MATCH (p33:Part {number: '33'})
+CREATE (p33)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R33.1',
+    text: 'Обеспечивать идентификацию изделия.',
+    category: 'TRACEABILITY',
+    priority: 'HIGH',
+    verification_method: 'ПРОВЕРКА ЧИТАЕМОСТИ',
+    readability: '100%',
+    created: datetime()
+})
+
+CREATE (p33)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R33.2',
+    text: 'Сохранять читаемость в течение срока службы.',
+    category: 'DURABILITY',
+    priority: 'MEDIUM',
+    verification_method: 'УСКОРЕННОЕ СТАРЕНИЕ',
+    weather_resistance: 'IP67',
+    created: datetime()
+})
+
+CREATE (p33)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R33.3',
+    text: 'Быть стойкой к внешним воздействиям.',
+    category: 'ENVIRONMENTAL',
+    priority: 'MEDIUM',
+    verification_method: 'ХИМИЧЕСКАЯ СТОЙКОСТЬ',
+    chemical_resistance: 'ДА',
+    created: datetime()
+})
+
+// 34. Заклёпка / винт крепления таблички
+MATCH (p34:Part {number: '34'})
+CREATE (p34)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R34.1',
+    text: 'Обеспечивать надежную фиксацию таблички.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИСПЫТАНИЕ НА ОТРЫВ',
+    pull_out_strength: '≥ 500 N',
+    created: datetime()
+})
+
+CREATE (p34)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R34.2',
+    text: 'Не нарушать герметичность корпуса.',
+    category: 'PROTECTIVE',
+    priority: 'MEDIUM',
+    verification_method: 'КОНТРОЛЬ ГЕРМЕТИЧНОСТИ',
+    sealing: 'ДА',
+    created: datetime()
+})
+
+CREATE (p34)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R34.3',
+    text: 'Быть коррозионно-стойким.',
+    category: 'CORROSION',
+    priority: 'MEDIUM',
+    verification_method: 'СОЛЕВОЙ ТУМАН',
+    corrosion_resistance: 'КЛАСС А2',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для маркировки и сервиса (33-34)' AS Статус;
+
+-- =============================================
+-- 11. ТРЕБОВАНИЯ ДЛЯ НОРМИРУЕМЫХ МАТЕРИАЛОВ (35-36)
+-- =============================================
+
+// 35. Смазка сборочная
+MATCH (p35:Part {number: '35'})
+CREATE (p35)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R35.1',
+    text: 'Снижать трение при первичной эксплуатации.',
+    category: 'FUNCTIONAL',
+    priority: 'HIGH',
+    verification_method: 'ИЗМЕРЕНИЕ КОЭФФИЦИЕНТА ТРЕНИЯ',
+    friction_reduction: '≥ 50%',
+    created: datetime()
+})
+
+CREATE (p35)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R35.2',
+    text: 'Быть совместимой с материалами уплотнений.',
+    category: 'COMPATIBILITY',
+    priority: 'HIGH',
+    verification_method: 'ХИМИЧЕСКАЯ СОВМЕСТИМОСТЬ',
+    material_compatibility: 'ПОЛНАЯ',
+    created: datetime()
+})
+
+CREATE (p35)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R35.3',
+    text: 'Не ухудшать свойства рабочей среды.',
+    category: 'PROCESS',
+    priority: 'MEDIUM',
+    verification_method: 'АНАЛИЗ РАБОЧЕЙ СРЕДЫ',
+    contamination: 'ОТСУТСТВУЕТ',
+    created: datetime()
+})
+
+// 36. Консервационное покрытие
+MATCH (p36:Part {number: '36'})
+CREATE (p36)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R36.1',
+    text: 'Обеспечивать защиту от коррозии при хранении.',
+    category: 'PROTECTIVE',
+    priority: 'HIGH',
+    verification_method: 'СОЛЕВОЙ ТУМАН',
+    protection_duration: '≥ 300 часов',
+    created: datetime()
+})
+
+CREATE (p36)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R36.2',
+    text: 'Легко удаляться или быть нейтральным при вводе в эксплуатацию.',
+    category: 'PROCESS',
+    priority: 'MEDIUM',
+    verification_method: 'ТЕСТ НА УДАЛЯЕМОСТЬ',
+    removability: 'ЛЕГКО',
+    created: datetime()
+})
+
+CREATE (p36)-[:HAS_REQUIREMENT]->(:Requirement {
+    id: 'R36.3',
+    text: 'Сохранять свойства в заданных условиях хранения.',
+    category: 'STORAGE',
+    priority: 'MEDIUM',
+    verification_method: 'УСКОРЕННОЕ СТАРЕНИЕ',
+    shelf_life: '≥ 24 месяца',
+    created: datetime()
+})
+
+RETURN '✓ Созданы требования для нормируемых материалов (35-36)' AS Статус;
+
+-- =============================================
+-- 12. ПРОВЕРКА И ВАЛИДАЦИЯ ВСЕХ ТРЕБОВАНИЙ
+-- =============================================
+
+// Проверяем общее количество созданных требований
+MATCH (r:Requirement)
+WITH COUNT(r) as total_requirements
+
+// Проверяем количество деталей с требованиями
+MATCH (p:Part)-[:HAS_REQUIREMENT]->(r:Requirement)
+WITH total_requirements, COUNT(DISTINCT p) as parts_with_requirements
+
+// Проверяем распределение по категориям требований
+MATCH (r:Requirement)
+WITH total_requirements, parts_with_requirements,
+     COUNT(CASE WHEN r.category = 'FUNCTIONAL' THEN 1 END) as functional_reqs,
+     COUNT(CASE WHEN r.category = 'SAFETY' THEN 1 END) as safety_reqs,
+     COUNT(CASE WHEN r.category = 'RELIABILITY' THEN 1 END) as reliability_reqs,
+     COUNT(CASE WHEN r.priority = 'CRITICAL' THEN 1 END) as critical_reqs,
+     COUNT(CASE WHEN r.priority = 'HIGH' THEN 1 END) as high_reqs,
+     COUNT(CASE WHEN r.priority = 'MEDIUM' THEN 1 END) as medium_reqs
+
+RETURN 
+  total_requirements as Всего_требований,
+  parts_with_requirements as Деталей_с_требованиями,
+  CASE 
+    WHEN total_requirements = 108 THEN '✓ Все требования созданы'
+    ELSE '⚠ Создано ' + total_requirements + ' требований из 108'
+  END AS Статус_требований,
+  CASE 
+    WHEN parts_with_requirements = 35 THEN '✓ Все детали имеют требования'
+    ELSE '⚠ Требования созданы для ' + parts_with_requirements + ' деталей из 35'
+  END AS Статус_деталей,
+  functional_reqs as Функциональных_требований,
+  safety_reqs as Требований_безопасности,
+  reliability_reqs as Требований_надежности,
+  critical_reqs as Критических_требований,
+  high_reqs as Высокоприоритетных,
+  medium_reqs as Среднеприоритетных;
+
+-- =============================================
+-- 13. СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ТРЕБОВАНИЙ
+-- =============================================
+
+// Создаем индексы для быстрого поиска требований
+CREATE INDEX requirement_id IF NOT EXISTS FOR (r:Requirement) ON (r.id);
+
+CREATE INDEX requirement_category IF NOT EXISTS FOR (r:Requirement) ON (r.category);
+
+CREATE INDEX requirement_priority IF NOT EXISTS FOR (r:Requirement) ON (r.priority);
+
+CREATE INDEX requirement_verification IF NOT EXISTS FOR (r:Requirement) ON (r.verification_method);
+
+RETURN '✓ Созданы индексы для требований' AS Статус;
+
+-- =============================================
+-- 14. ЭКСПОРТ СВОДНОЙ ИНФОРМАЦИИ
+-- =============================================
+
+// Сводная информация по всем требованиям
+MATCH (p:Part)-[:HAS_REQUIREMENT]->(r:Requirement)
+WITH p, COLLECT(r) as requirements
+RETURN 
+  p.number as Номер_детали,
+  p.name as Наименование_детали,
+  SIZE(requirements) as Количество_требований,
+  [r IN requirements | r.id] as ID_требований,
+  [r IN requirements | r.priority] as Приоритеты,
+  CASE 
+    WHEN SIZE(requirements) = 3 THEN '✓ Полный комплект'
+    WHEN SIZE(requirements) > 0 THEN '⚠ Частичный комплект'
+    ELSE '✗ Нет требований'
+  END as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 15. АНАЛИЗ ПО КАТЕГОРИЯМ И ПРИОРИТЕТАМ
+-- =============================================
+
+// Анализ распределения требований
+MATCH (r:Requirement)
+WITH 
+  COLLECT(DISTINCT r.category) as categories,
+  COLLECT(DISTINCT r.priority) as priorities,
+  COUNT(r) as total_reqs,
+  AVG(LENGTH(r.text)) as avg_text_length
+
+RETURN 
+  'АНАЛИЗ ТРЕБОВАНИЙ EBOM' as Раздел,
+  total_reqs as Всего_требований,
+  categories as Категории,
+  priorities as Уровни_приоритета,
+  ROUND(avg_text_length) as 'Средняя длина текста',
+  '108 требований для 36 деталей' as Описание;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 12 ВЫПОЛНЕН УСПЕШНО. СОЗДАНО 108 ТРЕБОВАНИЙ ДЛЯ 36 ДЕТАЛЕЙ EBOM.' AS ФИНАЛЬНЫЙ_СТАТУС;

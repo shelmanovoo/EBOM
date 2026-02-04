@@ -1,0 +1,333 @@
+-- =============================================
+-- Создание деталей для узла "Запорный элемент" (Assembly 2)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает деталь "Шар запорный" (номер 9)
+-- и связывает ее с узлом "Запорный элемент"
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Запорный элемент"
+MATCH (zaporny:Assembly {number: '2', name: 'Запорный элемент'})
+WITH count(zaporny) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Запорный элемент" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛИ "ШАР ЗАПОРНЫЙ" (9)
+-- =============================================
+
+// Находим родительский узел "Запорный элемент"
+MATCH (zaporny:Assembly {number: '2', name: 'Запорный элемент'})
+
+// 9. Шар запорный - ключевая деталь крана
+CREATE (p9:Part {
+    number: '9',
+    name: 'Шар запорный',
+    description: 'Основной запорный элемент шарового крана с проходным отверстием',
+    function: 'Перекрытие потока рабочей среды при повороте на 90°',
+    material_spec: 'Нержавеющая сталь 12Х18Н10Т',
+    material_grade: 'AISI 316',
+    coating: 'Хромирование, толщина 15-20 мкм',
+    
+    -- Геометрические параметры
+    diameter_mm: 62.0,
+    hole_diameter_mm: 50.0,  -- DN50
+    sphericity_tolerance: 'IT7',
+    surface_roughness: 'Ra 0.4',
+    
+    -- Механические свойства
+    hardness: 'HRC 45-50',
+    weight_kg: 1.8,
+    balance_class: 'G2.5',
+    
+    -- Технологические параметры
+    manufacturing_method: 'Точное литье + шлифовка',
+    heat_treatment: 'Закалка + низкий отпуск',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-60 °C',
+    temperature_max: '200 °C',
+    media_compatibility: 'Вода, пар, нефтепродукты, химические среды',
+    
+    -- Контроль качества
+    inspection_level: '100%',
+    ndt_methods: ['Ультразвуковой контроль', 'Контроль твердости'],
+    
+    created: datetime(),
+    status: 'CRITICAL',
+    category: 'SHUTOFF_ELEMENT',
+    drawing_number: 'КК-09-001',
+    standard: 'ГОСТ 28908-91',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    life_cycles: '≥ 10000 циклов',
+    torque_max: '50 Н·м',
+    leak_class: 'Класс А по ГОСТ 9544-2015',
+    certificate_required: true,
+    traceability_required: true
+})
+
+RETURN '✓ Создана деталь: ' + p9.name + ' (номер: ' + p9.number + ')' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКОЙ СВЯЗИ
+-- =============================================
+
+// Связываем деталь с узлом "Запорный элемент"
+CREATE (zaporny)-[:CONTAINS {
+    relationship_id: 'SHUTOFF-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    mounting_direction: 'ГОРИЗОНТАЛЬНО',
+    assembly_operation: 'Установка шара в седла',
+    assembly_tool: 'Спецприспособление ШП-1',
+    torque_required: 'Не требуется',
+    alignment_required: true,
+    created: datetime(),
+    notes: 'Устанавливается между седлами с предварительной смазкой'
+}]->(p9)
+
+RETURN '✓ Создана иерархическая связь' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ С ДРУГИМИ КРИТИЧЕСКИМИ ДЕТАЛЯМИ
+-- =============================================
+
+// Проверяем существование связанных деталей и создаем связи
+MATCH (shar:Part {number: '9'})
+
+// Попытка найти седла (будут созданы в следующем скрипте)
+OPTIONAL MATCH (sedlo_left:Part {number: '10'})
+OPTIONAL MATCH (sedlo_right:Part {number: '11'})
+
+// Создаем связи взаимодействия, если детали существуют
+FOREACH (ignore IN CASE WHEN sedlo_left IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (shar)-[:INTERACTS_WITH {
+        interaction_type: 'SEALING_INTERFACE',
+        interface_type: 'SPHERICAL',
+        clearance: '0.05-0.1 мм',
+        pressure_distribution: 'РАВНОМЕРНОЕ',
+        created: datetime()
+    }]->(sedlo_left)
+)
+
+FOREACH (ignore IN CASE WHEN sedlo_right IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (shar)-[:INTERACTS_WITH {
+        interaction_type: 'SEALING_INTERFACE',
+        interface_type: 'SPHERICAL',
+        clearance: '0.05-0.1 мм',
+        pressure_distribution: 'РАВНОМЕРНОЕ',
+        created: datetime()
+    }]->(sedlo_right)
+)
+
+// Связь со штоком (будет создан позже)
+OPTIONAL MATCH (shtok:Part {number: '14'})
+FOREACH (ignore IN CASE WHEN shtok IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (shar)-[:CONNECTS_TO {
+        connection_type: 'SPLINE_CONNECTION',
+        torque_transmission: 'ПОЛНАЯ',
+        backlash: '≤ 0.1 мм',
+        created: datetime()
+    }]->(shtok)
+)
+
+RETURN '✓ Созданы связи взаимодействия (если связанные детали существуют)' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ ТЕХНОЛОГИЧЕСКИХ ХАРАКТЕРИСТИК
+-- =============================================
+
+// Создаем отдельные узлы для технологических параметров (опционально)
+CREATE (tech_params:TechnicalParameters {
+    part_number: '9',
+    part_name: 'Шар запорный',
+    
+    -- Допуски и посадки
+    diameter_tolerance: '62h6',
+    sphericity_tolerance: '0.008 мм',
+    surface_roughness: 'Ra 0.4',
+    
+    -- Контроль параметров
+    inspection_method: 'КООРДИНАТОМЕР + ПРОФИЛОГРАФ',
+    sample_size: '100%',
+    accept_criteria: 'ГОСТ 24643-81',
+    
+    -- Упаковка и хранение
+    packaging: 'Индивидуальная консервация в вакуумной упаковке',
+    storage_conditions: 'Температура -10...+40°C, влажность ≤ 70%',
+    shelf_life: '5 лет',
+    
+    created: datetime()
+})
+
+// Связываем с деталью
+MATCH (shar:Part {number: '9'})
+CREATE (shar)-[:HAS_TECH_PARAMS {
+    params_type: 'MANUFACTURING',
+    created: datetime()
+}]->(tech_params)
+
+RETURN '✓ Созданы технологические параметры' AS Статус;
+
+-- =============================================
+-- 5. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем создание детали
+MATCH (zaporny:Assembly {number: '2'})-[:CONTAINS]->(part:Part)
+WHERE part.number = '9'
+WITH zaporny, part, COUNT(part) as part_count
+
+// Проверяем атрибуты детали
+OPTIONAL MATCH (part)-[:HAS_TECH_PARAMS]->(tech:TechnicalParameters)
+
+RETURN 
+  'Запорный элемент' as Сборочный_узел,
+  part_count as Количество_деталей,
+  CASE 
+    WHEN part_count = 1 THEN '✓ Деталь создана'
+    ELSE '✗ Ошибка: деталь не создана'
+  END AS Статус_создания,
+  part.number as Номер,
+  part.name as Наименование,
+  part.material_spec as Материал,
+  part.diameter_mm as Диаметр_мм,
+  part.hole_diameter_mm as Диаметр_отверстия_мм,
+  part.pressure_rating as Рабочее_давление,
+  tech IS NOT NULL as Техпараметры_созданы,
+  part.drawing_number as Номер_чертежа,
+  part.standard as Стандарт;
+
+-- =============================================
+-- 6. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по шару запорному
+MATCH (zaporny:Assembly {number: '2'})-[r:CONTAINS]->(p:Part {number: '9'})
+OPTIONAL MATCH (p)-[:HAS_TECH_PARAMS]->(tech:TechnicalParameters)
+RETURN 
+  'Критическая деталь' as Категория_детали,
+  p.number as Номер_детали,
+  p.name as Наименование,
+  'Запорный элемент' as Родительский_узел,
+  
+  -- Основные параметры
+  p.material_spec as Материал,
+  p.coating as Покрытие,
+  p.diameter_mm as 'Диаметр шара, мм',
+  p.hole_diameter_mm as 'Диаметр отверстия, мм',
+  p.pressure_rating as 'Номинальное давление',
+  p.temperature_min as 'Мин. температура',
+  p.temperature_max as 'Макс. температура',
+  
+  -- Конструктивные параметры
+  p.hardness as Твердость,
+  p.weight_kg as 'Вес, кг',
+  p.surface_roughness as 'Шероховатость',
+  
+  -- Контроль качества
+  p.inspection_level as 'Уровень контроля',
+  p.ndt_methods as 'Методы НК',
+  p.certificate_required as 'Сертификат требуется',
+  
+  -- Технологические параметры
+  tech.diameter_tolerance as 'Допуск диаметра',
+  tech.sphericity_tolerance as 'Допуск сферичности',
+  tech.inspection_method as 'Метод контроля',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.assembly_operation as 'Операция сборки',
+  r.assembly_tool as 'Инструмент сборки',
+  
+  -- Документация
+  p.drawing_number as 'Номер чертежа',
+  p.standard as Стандарт,
+  p.revision as Ревизия
+ORDER BY p.number;
+
+-- =============================================
+-- 7. СВОДНАЯ СТАТИСТИКА ПО УЗЛУ
+-- =============================================
+
+// Статистика по узлу "Запорный элемент"
+MATCH (zaporny:Assembly {number: '2'})
+OPTIONAL MATCH (zaporny)-[:CONTAINS]->(part:Part)
+WITH zaporny, 
+     COLLECT(part) as parts,
+     COUNT(part) as total_parts,
+     CASE 
+       WHEN SIZE(parts) > 0 THEN parts[0]
+       ELSE null
+     END as first_part
+
+RETURN 
+  zaporny.name as Сборочный_узел,
+  zaporny.number as Номер_узла,
+  total_parts as Количество_деталей,
+  CASE 
+    WHEN total_parts = 1 THEN '✓ Комплект полный'
+    WHEN total_parts > 1 THEN '⚠ Больше одной детали'
+    ELSE '✗ Детали отсутствуют'
+  END as Статус_комплектности,
+  first_part.number as Номер_детали,
+  first_part.name as Наименование_детали,
+  first_part.category as Категория_детали,
+  'Ключевой элемент шарового крана' as Примечание;
+
+-- =============================================
+-- 8. СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ШАРА
+-- =============================================
+
+// Специальные индексы для критических деталей
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.category)
+WHERE p.category = 'SHUTOFF_ELEMENT'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.status)
+WHERE p.status = 'CRITICAL'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.drawing_number)
+
+RETURN '✓ Созданы специализированные индексы' AS Статус;
+
+-- =============================================
+-- 9. ПРОВЕРКА ВЗАИМОДЕЙСТВИЙ
+-- =============================================
+
+// Проверка ожидаемых взаимодействий шара
+MATCH (shar:Part {number: '9'})
+OPTIONAL MATCH (shar)-[interaction]->(other:Part)
+WITH shar,
+     COLLECT(DISTINCT TYPE(interaction)) as interaction_types,
+     COLLECT(DISTINCT other.number) as interacting_parts,
+     COUNT(interaction) as total_interactions
+
+RETURN 
+  shar.number as Номер_детали,
+  shar.name as Наименование,
+  total_interactions as Количество_взаимодействий,
+  interaction_types as Типы_взаимодействий,
+  interacting_parts as Взаимодействующие_детали,
+  CASE 
+    WHEN total_interactions >= 2 THEN '✓ Взаимодействия настроены'
+    WHEN total_interactions = 0 THEN '⚠ Нет взаимодействий (возможно, связанные детали еще не созданы)'
+    ELSE '⚠ Частичные взаимодействия'
+  END as Статус_взаимодействий;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 03 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

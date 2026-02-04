@@ -1,0 +1,608 @@
+-- =============================================
+-- Создание деталей для узла "Присоединительные элементы" (Assembly 8)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 2 детали для сборочного узла "Присоединительные элементы"
+-- Детали 31-32: Патрубки входной и выходной
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Присоединительные элементы"
+MATCH (connections:Assembly {number: '8', name: 'Присоединительные элементы'})
+WITH count(connections) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Присоединительные элементы" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ ПРИСОЕДИНИТЕЛЬНЫХ ЭЛЕМЕНТОВ (31-32)
+-- =============================================
+
+// Находим родительский узел "Присоединительные элементы"
+MATCH (connections_assembly:Assembly {number: '8', name: 'Присоединительные элементы'})
+
+// 31. Патрубок входной
+CREATE (p31:Part {
+    number: '31',
+    name: 'Патрубок входной',
+    description: 'Входной фланцевый патрубок шарового крана',
+    function: 'Присоединение крана к трубопроводу, подвод рабочей среды',
+    material_spec: 'Сталь 20',
+    material_grade: 'St20',
+    manufacturing_method: 'ТОКАРНАЯ ОБРАБОТКА + СВАРКА',
+    
+    -- Основные геометрические параметры
+    nominal_diameter: 'DN50',
+    outer_diameter_mm: 60.0,
+    inner_diameter_mm: 52.5,
+    wall_thickness_mm: 3.75,
+    length_mm: 80.0,
+    
+    -- Фланцевые параметры
+    flange_type: 'ПЛОСКИЙ ПРИВАРНОЙ',
+    flange_standard: 'ГОСТ 12820-80',
+    flange_pressure: 'PN16',
+    bolt_circle_diameter_mm: 125.0,
+    bolt_holes_count: 4,
+    bolt_holes_diameter_mm: 18.0,
+    flange_thickness_mm: 18.0,
+    flange_outer_diameter_mm: 165.0,
+    
+    -- Посадочные поверхности
+    sealing_surface: 'ГЛУХОЙ ПАЗ',
+    gasket_type: 'ПАРОНИТОВАЯ',
+    gasket_size: '50-16',
+    raised_face: true,
+    face_height_mm: 2.0,
+    
+    -- Допуски и посадки
+    concentricity: '0.1 мм',
+    perpendicularity: '0.05 мм',
+    face_flatness: '0.05 мм',
+    bore_tolerance: 'H11',
+    
+    -- Механические свойства
+    pressure_rating: 'PN16',
+    test_pressure: '24 бар',
+    temperature_min: '-40 °C',
+    temperature_max: '300 °C',
+    bending_moment_capacity: '800 Н·м',
+    
+    -- Сварочные параметры
+    weld_preparation: 'СКОС 30°',
+    weld_type: 'СТЫКОВОЙ ШОВ',
+    weld_material: 'ЭЛЕКТРОД УОНИ-13/55',
+    ndt_requirement: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    
+    -- Антикоррозионная защита
+    internal_coating: 'ЭПОКСИДНОЕ ПОКРЫТИЕ',
+    external_coating: 'ПОРОШКОВАЯ ПОКРАСКА',
+    coating_thickness: '80-120 мкм',
+    color: 'СЕРО-ГОЛУБОЙ RAL 7035',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'CONNECTION_COMPONENT',
+    subcategory: 'INLET_NOZZLE',
+    drawing_number: 'КК-31-001',
+    standard: 'ГОСТ 12815-80',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    flow_direction: 'ВХОД',
+    arrow_marking_required: true,
+    p&id_symbol: 'КРАН ШАРОВОЙ',
+    installation_torque: '100 Н·м',
+    alignment_marks: 'ТОЧКА ВЕРХНЕГО ПОЛОЖЕНИЯ'
+})
+
+// 32. Патрубок выходной
+CREATE (p32:Part {
+    number: '32',
+    name: 'Патрубок выходной',
+    description: 'Выходной фланцевый патрубок шарового крана',
+    function: 'Присоединение крана к трубопроводу, отвод рабочей среды',
+    material_spec: 'Сталь 20',
+    material_grade: 'St20',
+    manufacturing_method: 'ТОКАРНАЯ ОБРАБОТКА + СВАРКА',
+    
+    -- Основные геометрические параметры
+    nominal_diameter: 'DN50',
+    outer_diameter_mm: 60.0,
+    inner_diameter_mm: 52.5,
+    wall_thickness_mm: 3.75,
+    length_mm: 80.0,
+    
+    -- Фланцевые параметры
+    flange_type: 'ПЛОСКИЙ ПРИВАРНОЙ',
+    flange_standard: 'ГОСТ 12820-80',
+    flange_pressure: 'PN16',
+    bolt_circle_diameter_mm: 125.0,
+    bolt_holes_count: 4,
+    bolt_holes_diameter_mm: 18.0,
+    flange_thickness_mm: 18.0,
+    flange_outer_diameter_mm: 165.0,
+    
+    -- Посадочные поверхности
+    sealing_surface: 'ГЛУХОЙ ПАЗ',
+    gasket_type: 'ПАРОНИТОВАЯ',
+    gasket_size: '50-16',
+    raised_face: true,
+    face_height_mm: 2.0,
+    
+    -- Допуски и посадки
+    concentricity: '0.1 мм',
+    perpendicularity: '0.05 мм',
+    face_flatness: '0.05 мм',
+    bore_tolerance: 'H11',
+    
+    -- Механические свойства
+    pressure_rating: 'PN16',
+    test_pressure: '24 бар',
+    temperature_min: '-40 °C',
+    temperature_max: '300 °C',
+    bending_moment_capacity: '800 Н·м',
+    
+    -- Сварочные параметры
+    weld_preparation: 'СКОС 30°',
+    weld_type: 'СТЫКОВОЙ ШОВ',
+    weld_material: 'ЭЛЕКТРОД УОНИ-13/55',
+    ndt_requirement: 'ВИЗУАЛЬНЫЙ КОНТРОЛЬ',
+    
+    -- Антикоррозионная защита
+    internal_coating: 'ЭПОКСИДНОЕ ПОКРЫТИЕ',
+    external_coating: 'ПОРОШКОВАЯ ПОКРАСКА',
+    coating_thickness: '80-120 мкм',
+    color: 'СЕРО-ГОЛУБОЙ RAL 7035',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'CONNECTION_COMPONENT',
+    subcategory: 'OUTLET_NOZZLE',
+    drawing_number: 'КК-32-001',
+    standard: 'ГОСТ 12815-80',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    flow_direction: 'ВЫХОД',
+    arrow_marking_required: true,
+    p&id_symbol: 'КРАН ШАРОВОЙ',
+    installation_torque: '100 Н·м',
+    pressure_test_port: false,
+    drain_port: 'НИЖНЕЕ ПОЛОЖЕНИЕ'
+})
+
+RETURN '✓ Создано 2 детали присоединительных элементов (номера 31-32)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Присоединительные элементы"
+WITH connections_assembly
+MATCH (p31:Part {number: '31'})
+MATCH (p32:Part {number: '32'})
+
+// Создаем связи с атрибутами
+CREATE (connections_assembly)-[:CONTAINS {
+    relationship_id: 'CONN-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    flow_direction: 'ВХОД',
+    installation_position: 'ЛЕВАЯ СТОРОНА',
+    orientation_requirement: 'ПО ТЕЧЕНИЮ',
+    created: datetime()
+}]->(p31)
+
+CREATE (connections_assembly)-[:CONTAINS {
+    relationship_id: 'CONN-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    flow_direction: 'ВЫХОД',
+    installation_position: 'ПРАВАЯ СТОРОНА',
+    orientation_requirement: 'ПО ТЕЧЕНИЮ',
+    created: datetime()
+}]->(p32)
+
+RETURN '✓ Создано 2 иерархические связи' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ ПАТРУБКАМИ
+-- =============================================
+
+// Связи между патрубками
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+
+// Патрубки являются парными элементами
+CREATE (inlet)-[:PAIRED_WITH {
+    pairing_type: 'INLET_OUTLET_PAIR',
+    alignment: 'СООСНОСТЬ ≤ 0.5 мм',
+    parallelism: '≤ 0.3 мм',
+    flow_path: 'ПРЯМОЙ',
+    created: datetime()
+}]->(outlet)
+
+// Обратная связь
+CREATE (outlet)-[:PAIRED_WITH {
+    pairing_type: 'OUTLET_INLET_PAIR',
+    alignment_requirement: 'СОВМЕСТНАЯ ОБРАБОТКА',
+    created: datetime()
+}]->(inlet)
+
+RETURN '✓ Созданы связи между патрубками' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С КОРПУСОМ
+-- =============================================
+
+// Связи патрубков с корпусом
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+OPTIONAL MATCH (korpus_left:Part {number: '2'})
+OPTIONAL MATCH (korpus_right:Part {number: '3'})
+
+FOREACH (ignore IN CASE WHEN korpus_left IS NOT NULL THEN [1] ELSE [] END |
+    // Входной патрубок приварен к левому корпусу
+    CREATE (inlet)-[:WELDED_TO {
+        weld_type: 'СТЫКОВОЙ ШОВ СКВОЗНОЙ',
+        weld_position: '1G',
+        weld_quality: 'ВЫСОКАЯ',
+        post_weld_heat_treatment: 'НЕ ТРЕБУЕТСЯ',
+        created: datetime()
+    }]->(korpus_left)
+    
+    // Обратная связь
+    CREATE (korpus_left)-[:HAS_INLET_NOZZLE]->(inlet)
+)
+
+FOREACH (ignore IN CASE WHEN korpus_right IS NOT NULL THEN [1] ELSE [] END |
+    // Выходной патрубок приварен к правому корпусу
+    CREATE (outlet)-[:WELDED_TO {
+        weld_type: 'СТЫКОВОЙ ШОВ СКВОЗНОЙ',
+        weld_position: '1G',
+        weld_quality: 'ВЫСОКАЯ',
+        post_weld_heat_treatment: 'НЕ ТРЕБУЕТСЯ',
+        created: datetime()
+    }]->(korpus_right)
+    
+    // Обратная связь
+    CREATE (korpus_right)-[:HAS_OUTLET_NOZZLE]->(outlet)
+)
+
+RETURN '✓ Созданы связи с корпусом' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ ТЕХНОЛОГИИ СВАРКИ И МОНТАЖА
+-- =============================================
+
+// Создаем технологию сварки патрубков
+CREATE (weld_procedure:WeldingProcedure {
+    procedure_id: 'WPS-CONN-001',
+    procedure_name: 'Сварка фланцевых патрубков',
+    applicable_parts: ['31', '32'],
+    
+    -- Параметры сварки
+    welding_process: 'РДС (MMA)',
+    electrode_type: 'УОНИ-13/55',
+    electrode_diameter: '3.2 мм',
+    current_type: 'ПОСТОЯННЫЙ ОБРАТНОЙ ПОЛЯРНОСТИ',
+    current_range: '90-120 А',
+    voltage_range: '22-26 В',
+    travel_speed: '100-150 мм/мин',
+    
+    -- Подготовка
+    joint_preparation: 'СКОС 30° С ПРИТУПЛЕНИЕМ 2 ММ',
+    root_gap: '2-3 мм',
+    cleaning_requirement: 'ЗАЧИСТКА ДО МЕТАЛЛИЧЕСКОГО БЛЕСКА',
+    
+    -- Последовательность сварки
+    weld_sequence: [
+        'Прихватка в 4 точках',
+        'Корневой шов',
+        'Заполняющие швы (2-3 прохода)',
+        'Лицевой шов'
+    ],
+    
+    -- Контроль качества
+    visual_inspection: '100%',
+    ndt_methods: ['ВИЗУАЛЬНЫЙ КОНТРОЛЬ', 'ЦВЕТНАЯ ДЕФЕКТОСКОПИЯ'],
+    acceptance_criteria: 'ГОСТ 14771-76',
+    
+    -- Квалификация
+    welder_certification: 'ГОСТ Р ИСО 9606-1',
+    qualification_position: 'PA (1G)',
+    
+    created: datetime()
+})
+
+// Связываем технологию с патрубками
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+CREATE (inlet)-[:REQUIRES_WELDING_PROCEDURE]->(weld_procedure)
+CREATE (outlet)-[:REQUIRES_WELDING_PROCEDURE]->(weld_procedure)
+
+RETURN '✓ Создана технология сварки' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ СВЯЗЕЙ С ТРУБОПРОВОДОМ И КОМПЛЕКТУЮЩИМИ
+-- =============================================
+
+// Создаем узлы для внешних соединений
+CREATE (pipe_connection:PipeConnection {
+    connection_id: 'PIPE-CONN-001',
+    connection_type: 'ФЛАНЦЕВОЕ',
+    pipe_specification: 'ТРУБА 57×3.5 ГОСТ 8732-78',
+    gasket_specification: 'ПАРОНИТ ПОН 50-16',
+    bolt_specification: 'БОЛТ М16×75 КЛ.8.8 ГОСТ 7798-70',
+    nut_specification: 'ГАЙКА М16 КЛ.8 ГОСТ 5915-70',
+    washer_specification: 'ШАЙБА 17 КЛ.СТАЛЬ ГОСТ 11371-78',
+    
+    -- Параметры монтажа
+    bolt_torque: '200 Н·м',
+    tightening_sequence: 'КРЕСТ-НАКРЕСТ',
+    alignment_tolerance: '1 ММ НА 1000 ММ',
+    
+    -- Герметизация
+    sealant_required: false,
+    gasket_lubrication: 'ГРАФИТОВАЯ СМАЗКА',
+    
+    created: datetime()
+})
+
+// Связываем патрубки с соединениями трубопровода
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+CREATE (inlet)-[:CONNECTS_TO_PIPELINE {
+    connection_standard: 'ГОСТ 12815-80',
+    installation_force: 'АКСИАЛЬНОЕ ВЫРАВНИВАНИЕ',
+    created: datetime()
+}]->(pipe_connection)
+
+CREATE (outlet)-[:CONNECTS_TO_PIPELINE {
+    connection_standard: 'ГОСТ 12815-80',
+    installation_force: 'АКСИАЛЬНОЕ ВЫРАВНИВАНИЕ',
+    created: datetime()
+}]->(pipe_connection)
+
+RETURN '✓ Созданы связи с трубопроводом' AS Статус;
+
+-- =============================================
+-- 7. СОЗДАНИЕ ИНФОРМАЦИИ ДЛЯ МАРКИРОВКИ И ИДЕНТИФИКАЦИИ
+-- =============================================
+
+// Создаем требования к маркировке
+CREATE (marking_requirements:MarkingRequirements {
+    requirement_id: 'MARK-CONN-001',
+    title: 'Требования к маркировке патрубков',
+    
+    marking_elements: [
+        'НОМИНАЛЬНЫЙ ДИАМЕТР (DN50)',
+        'НОМИНАЛЬНОЕ ДАВЛЕНИЕ (PN16)',
+        'МАТЕРИАЛ (St20)',
+        'НОМЕР ПАРТИИ',
+        'НАПРАВЛЕНИЕ ПОТОКА (Стрелка)',
+        'ТОЧКА ВЕРХНЕГО ПОЛОЖЕНИЯ',
+        'НОМЕР ЧЕРТЕЖА'
+    ],
+    
+    marking_method: 'ЭЛЕКТРОХИМИЧЕСКАЯ МАРКИРОВКА',
+    marking_location: 'НАРУЖНАЯ ПОВЕРХНОСТЬ ФЛАНЦА',
+    durability_requirement: 'СОХРАНЯЕМОСТЬ НЕ МЕНЕЕ 10 ЛЕТ',
+    
+    standards: ['ГОСТ 4666-75', 'ASME B16.25'],
+    
+    created: datetime()
+})
+
+// Связываем требования с патрубками
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+CREATE (inlet)-[:MUST_HAVE_MARKING]->(marking_requirements)
+CREATE (outlet)-[:MUST_HAVE_MARKING]->(marking_requirements)
+
+RETURN '✓ Созданы требования к маркировке' AS Статус;
+
+-- =============================================
+-- 8. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные детали
+MATCH (connections:Assembly {number: '8'})-[:CONTAINS]->(part:Part)
+WITH connections, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [31,32] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  2 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 2 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 9. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по присоединительным элементам
+MATCH (connections:Assembly {number: '8'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:REQUIRES_WELDING_PROCEDURE]->(weld:WeldingProcedure)
+OPTIONAL MATCH (p)-[:MUST_HAVE_MARKING]->(marking:MarkingRequirements)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  
+  -- Основные параметры
+  p.nominal_diameter as DN,
+  p.pressure_rating as PN,
+  p.flange_standard as 'Стандарт фланца',
+  
+  -- Геометрические параметры
+  p.outer_diameter_mm as 'Наружный диаметр, мм',
+  p.wall_thickness_mm as 'Толщина стенки, мм',
+  p.length_mm as 'Длина, мм',
+  
+  -- Фланцевые параметры
+  p.bolt_circle_diameter_mm as 'Диаметр окружности болтов, мм',
+  p.bolt_holes_count as 'Количество отверстий',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.unit as Единица,
+  r.flow_direction as 'Направление потока',
+  
+  -- Дополнительно
+  CASE 
+    WHEN weld IS NOT NULL THEN 'Требуется сварка'
+    ELSE '-'
+  END as Технология,
+  
+  CASE 
+    WHEN marking IS NOT NULL THEN 'Требуется маркировка'
+    ELSE '-'
+  END as Маркировка,
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 10. АНАЛИЗ ПРИСОЕДИНИТЕЛЬНЫХ ЭЛЕМЕНТОВ
+-- =============================================
+
+// Анализ характеристик патрубков
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 31 AND toInteger(p.number) <= 32
+WITH 
+  COLLECT(DISTINCT p.nominal_diameter) as diameters,
+  COLLECT(DISTINCT p.pressure_rating) as pressures,
+  COLLECT(DISTINCT p.flange_standard) as standards,
+  COUNT(p) as total_parts,
+  COLLECT(DISTINCT p.material_spec) as materials
+
+RETURN 
+  total_parts as Всего_деталей,
+  diameters as Номинальные_диаметры,
+  pressures as Номинальные_давления,
+  standards as Стандарты_фланцев,
+  materials as Используемые_материалы,
+  'Фланцевые соединения DN50 PN16' as Спецификация;
+
+-- =============================================
+-- 11. СОЗДАНИЕ ИНДЕКСОВ
+-- =============================================
+
+// Специальные индексы для присоединительных элементов
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.nominal_diameter)
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.pressure_rating)
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.flange_standard)
+
+RETURN '✓ Созданы специализированные индексы для присоединительных элементов' AS Статус;
+
+-- =============================================
+-- 12. ПРОВЕРКА ФУНКЦИОНАЛЬНОСТИ И СОВМЕСТИМОСТИ
+-- =============================================
+
+// Проверка парности и совместимости патрубков
+MATCH (connections:Assembly {number: '8'})
+OPTIONAL MATCH (connections)-[:CONTAINS]->(inlet:Part {subcategory: 'INLET_NOZZLE'})
+OPTIONAL MATCH (connections)-[:CONTAINS]->(outlet:Part {subcategory: 'OUTLET_NOZZLE'})
+
+WITH connections, inlet, outlet,
+     CASE WHEN inlet IS NOT NULL THEN inlet.nominal_diameter ELSE NULL END as inlet_dn,
+     CASE WHEN outlet IS NOT NULL THEN outlet.nominal_diameter ELSE NULL END as outlet_dn,
+     CASE WHEN inlet IS NOT NULL THEN inlet.pressure_rating ELSE NULL END as inlet_pn,
+     CASE WHEN outlet IS NOT NULL THEN outlet.pressure_rating ELSE NULL END as outlet_pn
+
+RETURN 
+  connections.name as Узел,
+  CASE WHEN inlet IS NOT NULL THEN inlet.name ELSE 'Нет' END as Входной_патрубок,
+  CASE WHEN outlet IS NOT NULL THEN outlet.name ELSE 'Нет' END as Выходной_патрубок,
+  inlet_dn as 'DN входа',
+  outlet_dn as 'DN выхода',
+  inlet_pn as 'PN входа',
+  outlet_pn as 'PN выхода',
+  CASE 
+    WHEN inlet_dn = outlet_dn AND inlet_pn = outlet_pn 
+    THEN '✓ Патрубки совместимы и парные'
+    WHEN inlet IS NOT NULL AND outlet IS NOT NULL AND inlet_dn != outlet_dn
+    THEN '✗ Несовпадение диаметров'
+    WHEN inlet IS NOT NULL AND outlet IS NOT NULL AND inlet_pn != outlet_pn
+    THEN '✗ Несовпадение давлений'
+    WHEN inlet IS NULL OR outlet IS NULL
+    THEN '✗ Неполный комплект'
+    ELSE '⚠ Требуется проверка'
+  END as Статус_совместимости;
+
+-- =============================================
+-- 13. СОЗДАНИЕ ИНФОРМАЦИИ ДЛЯ ПРОЕКТИРОВАНИЯ
+-- =============================================
+
+// Создаем данные для проектирования трубопроводов
+CREATE (piping_data:PipingDesignData {
+    data_id: 'PIPING-CONN-001',
+    title: 'Данные для проектирования подключения',
+    
+    -- Размеры для чертежей
+    face_to_face: '200 мм',
+    end_to_end: '280 мм',
+    flange_thickness: '18 мм',
+    raised_face_height: '2 мм',
+    
+    -- Весовые характеристики
+    nozzle_weight: '3.2 кг',
+    fluid_weight: '0.85 кг (вода)',
+    
+    -- Нагрузки
+    allowed_pipe_loads: [
+      'Осевая сила: 2000 N',
+      'Поперечная сила: 1000 N',
+      'Изгибающий момент: 800 N·m'
+    ],
+    
+    -- Тепловые расширения
+    thermal_expansion_coefficient: '12×10⁻⁶ 1/°C',
+    expansion_per_100°C: '0.24 мм',
+    
+    -- Для P&ID
+    p&id_symbol: 'КРАН ШАРОВОЙ С ФЛАНЦЕВЫМИ ПОДКЛЮЧЕНИЯМИ',
+    instrument_tag: 'XV-101',
+    
+    created: datetime()
+})
+
+// Связываем с патрубками
+MATCH (inlet:Part {number: '31'})
+MATCH (outlet:Part {number: '32'})
+CREATE (inlet)-[:HAS_PIPING_DATA]->(piping_data)
+CREATE (outlet)-[:HAS_PIPING_DATA]->(piping_data)
+
+RETURN '✓ Созданы данные для проектирования' AS Статус;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 09 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;

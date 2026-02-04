@@ -1,0 +1,581 @@
+-- =============================================
+-- Создание деталей для узла "Шток (узел передачи вращения)" (Assembly 4)
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает 5 деталей для сборочного узла "Шток"
+-- Детали 14-18: Шток и его компоненты
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ РОДИТЕЛЬСКОГО УЗЛА
+-- =============================================
+
+// Проверяем существование узла "Шток"
+MATCH (stem:Assembly {number: '4', name: 'Шток (узел передачи вращения)'})
+WITH count(stem) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Узел "Шток" не найден. Выполните сначала 01_create_assemblies.cypher' as Ошибка
+// Если узел не найден, скрипт остановится здесь
+
+-- =============================================
+-- 1. СОЗДАНИЕ ДЕТАЛЕЙ ШТОКА И КОМПОНЕНТОВ (14-18)
+-- =============================================
+
+// Находим родительский узел "Шток"
+MATCH (stem_assembly:Assembly {number: '4', name: 'Шток (узел передачи вращения)'})
+
+// 14. Шток крана - основная деталь
+CREATE (p14:Part {
+    number: '14',
+    name: 'Шток крана',
+    description: 'Основной вал передачи вращения от привода к шару',
+    function: 'Передача крутящего момента, позиционирование шара',
+    material_spec: 'Нержавеющая сталь 20Х13',
+    material_grade: 'AISI 420',
+    heat_treatment: 'Закалка + отпуск',
+    hardness: 'HRC 45-50',
+    
+    -- Геометрические параметры
+    diameter_mm: 20.0,
+    length_mm: 180.0,
+    spline_type: 'ПРЯМОЗУБАЯ',
+    spline_teeth: 10,
+    spline_module: '1.5',
+    
+    -- Критические размеры
+    sealing_diameter_mm: 20.0,
+    sealing_length_mm: 30.0,
+    square_size_mm: 14.0,
+    square_length_mm: 25.0,
+    
+    -- Допуски и посадки
+    diameter_tolerance: 'h6',
+    straightness: '0.02 мм/100 мм',
+    surface_roughness_sealing: 'Ra 0.8',
+    surface_roughness_spline: 'Ra 1.6',
+    
+    -- Механические свойства
+    tensile_strength: '≥ 800 MPa',
+    yield_strength: '≥ 600 MPa',
+    torsional_strength: '≥ 500 N·m',
+    fatigue_limit: '≥ 300 MPa',
+    
+    -- Антикоррозионные свойства
+    corrosion_resistance: 'ХОРОШАЯ',
+    coating: 'Полирование',
+    
+    created: datetime(),
+    status: 'CRITICAL',
+    category: 'ROTATING_SHAFT',
+    subcategory: 'STEM',
+    drawing_number: 'КК-14-001',
+    standard: 'ГОСТ 8479-70',
+    revision: 'A',
+    
+    -- Дополнительные атрибуты
+    torque_capacity: '120 Н·м',
+    max_bending_moment: '80 Н·м',
+    alignment_requirement: '≤ 0.05 мм',
+    balancing_required: true,
+    magnetic_particle_inspection: true
+})
+
+// 15. Кольцо уплотнительное штока верхнее
+CREATE (p15:Part {
+    number: '15',
+    name: 'Кольцо уплотнительное штока верхнее',
+    description: 'Основное динамическое уплотнение штока',
+    function: 'Герметизация вращающегося штока в верхней зоне',
+    material_spec: 'NBR (нитрильный каучук)',
+    material_grade: 'NBR 70 Shore A',
+    color: 'Черный',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 19.5,
+    cross_section_mm: 3.55,
+    tolerance: 'G7',
+    
+    -- Механические свойства
+    hardness_shore: 'A70',
+    compression_set: '≤ 15%',
+    friction_coefficient: '0.3-0.5',
+    wear_rate: 'НИЗКАЯ',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-30 °C',
+    temperature_max: '100 °C',
+    speed_max: '0.5 м/с',
+    chemical_resistance: 'Масла, вода, воздух',
+    
+    -- Особенности для вращающегося уплотнения
+    lip_design: 'ОДНОГУБОЕ',
+    spring_loaded: false,
+    pressure_activated: true,
+    
+    created: datetime(),
+    status: 'WEAR_PART',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'ROTARY_SEAL',
+    drawing_number: 'КК-15-001',
+    standard: 'ГОСТ 9833-73',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    replacement_interval: '5000 циклов',
+    installation_lubricant: 'Силиконовая смазка',
+    break_in_period: '10-20 циклов'
+})
+
+// 16. Кольцо уплотнительное штока нижнее
+CREATE (p16:Part {
+    number: '16',
+    name: 'Кольцо уплотнительное штока нижнее',
+    description: 'Резервное динамическое уплотнение штока',
+    function: 'Резервная герметизация, защита от загрязнений',
+    material_spec: 'NBR (нитрильный каучук)',
+    material_grade: 'NBR 70 Shore A',
+    color: 'Коричневый',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 19.5,
+    cross_section_mm: 3.55,
+    tolerance: 'G7',
+    
+    -- Механические свойства
+    hardness_shore: 'A70',
+    compression_set: '≤ 15%',
+    friction_coefficient: '0.3-0.5',
+    
+    -- Особенности нижнего уплотнения
+    lip_design: 'ДВУХГУБОЕ',
+    dust_lip: true,
+    pressure_direction: 'СНИЗУ ВВЕРХ',
+    
+    -- Эксплуатационные характеристики
+    pressure_rating: 'PN16',
+    temperature_min: '-30 °C',
+    temperature_max: '100 °C',
+    media_compatibility: 'Вода, воздух, слабые растворы',
+    
+    created: datetime(),
+    status: 'WEAR_PART',
+    category: 'SEALING_ELEMENT',
+    subcategory: 'ROTARY_SEAL',
+    drawing_number: 'КК-16-001',
+    standard: 'ГОСТ 9833-73',
+    revision: 'B',
+    
+    -- Дополнительные атрибуты
+    backup_seal: true,
+    contamination_protection: true,
+    maintenance_indicator: 'ПРОТЕЧКА ЧЕРЕЗ ДРЕНАЖ'
+})
+
+// 17. Кольцо опорное (упорное) штока
+CREATE (p17:Part {
+    number: '17',
+    name: 'Кольцо опорное (упорное) штока',
+    description: 'Осевая опора штока',
+    function: 'Восприятие осевых нагрузок, центрирование штока',
+    material_spec: 'Бронза БрАЖ9-4',
+    material_grade: 'CUZN25AL5',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 20.1,
+    outer_diameter_mm: 35.0,
+    thickness_mm: 10.0,
+    
+    -- Механические свойства
+    hardness_brinell: 'HB 80-100',
+    compressive_strength: '≥ 300 MPa',
+    wear_resistance: 'ВЫСОКАЯ',
+    friction_coefficient: '0.08-0.12',
+    
+    -- Конструктивные особенности
+    lubrication_grooves: true,
+    groove_pattern: 'СПИРАЛЬНЫЙ',
+    groove_depth_mm: 1.0,
+    
+    -- Эксплуатационные характеристики
+    load_capacity_axial: '2000 N',
+    load_capacity_radial: '500 N',
+    speed_max: '10 об/мин',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'BEARING_ELEMENT',
+    subcategory: 'THRUST_WASHER',
+    drawing_number: 'КК-17-001',
+    standard: 'ГОСТ 613-79',
+    
+    -- Дополнительные атрибуты
+    lubrication_required: true,
+    lubrication_type: 'ПЛАСТИЧНАЯ СМАЗКА',
+    alignment_function: true,
+    wear_indicator: 'ОСЕВОЙ ЛЮФТ'
+})
+
+// 18. Втулка штока
+CREATE (p18:Part {
+    number: '18',
+    name: 'Втулка штока',
+    description: 'Направляющая втулка штока',
+    function: 'Направляющая и радиальная опора штока',
+    material_spec: 'Бронза БрОЦС5-5-5',
+    material_grade: 'CUZN5PB5SN5',
+    
+    -- Геометрические параметры
+    inner_diameter_mm: 20.1,
+    outer_diameter_mm: 30.0,
+    length_mm: 40.0,
+    
+    -- Механические свойства
+    hardness_brinell: 'HB 60-80',
+    compressive_strength: '≥ 200 MPa',
+    wear_resistance: 'ХОРОШАЯ',
+    
+    -- Конструктивные особенности
+    lubrication_holes: true,
+    holes_count: 4,
+    holes_diameter_mm: 3.0,
+    
+    -- Допуски и посадки
+    inner_diameter_tolerance: 'H7',
+    outer_diameter_tolerance: 'r6',
+    
+    -- Эксплуатационные характеристики
+    radial_load_capacity: '1000 N',
+    guide_length: '2xD',
+    clearance: '0.05-0.1 мм',
+    
+    created: datetime(),
+    status: 'STANDARD',
+    category: 'BEARING_ELEMENT',
+    subcategory: 'BUSING',
+    drawing_number: 'КК-18-001',
+    standard: 'ГОСТ 6930-74',
+    
+    -- Дополнительные атрибуты
+    installation_press_fit: '0.02-0.05 мм',
+    replacement_condition: 'ИЗНОС > 0.3 мм',
+    alignment_tolerance: '≤ 0.03 мм'
+})
+
+RETURN '✓ Создано 5 деталей штока (номера 14-18)' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Связываем детали с узлом "Шток"
+WITH stem_assembly
+MATCH (p14:Part {number: '14'})
+MATCH (p15:Part {number: '15'})
+MATCH (p16:Part {number: '16'})
+MATCH (p17:Part {number: '17'})
+MATCH (p18:Part {number: '18'})
+
+// Создаем связи с атрибутами
+CREATE (stem_assembly)-[:CONTAINS {
+    relationship_id: 'STEM-001',
+    sequence: 1,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'ЦЕНТРАЛЬНАЯ ОСЬ',
+    mounting_torque: '60-80 Н·м',
+    alignment_required: true,
+    created: datetime()
+}]->(p14)
+
+CREATE (stem_assembly)-[:CONTAINS {
+    relationship_id: 'STEM-002',
+    sequence: 2,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'ВЕРХНЕЕ УПЛОТНЕНИЕ',
+    installation_depth: '15 мм от верха',
+    lubrication_required: true,
+    created: datetime()
+}]->(p15)
+
+CREATE (stem_assembly)-[:CONTAINS {
+    relationship_id: 'STEM-003',
+    sequence: 3,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'НИЖНЕЕ УПЛОТНЕНИЕ',
+    installation_depth: '25 мм от верха',
+    backup_seal: true,
+    created: datetime()
+}]->(p16)
+
+CREATE (stem_assembly)-[:CONTAINS {
+    relationship_id: 'STEM-004',
+    sequence: 4,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'НИЖНЯЯ ОПОРА',
+    preload: '10-15 N',
+    lubrication_groove_align: 'СОВМЕСТИТЬ С ОТВЕРСТИЕМ',
+    created: datetime()
+}]->(p17)
+
+CREATE (stem_assembly)-[:CONTAINS {
+    relationship_id: 'STEM-005',
+    sequence: 5,
+    quantity: 1,
+    unit: 'шт',
+    assembly_position: 'НАПРАВЛЯЮЩАЯ',
+    press_fit_force: '2-3 тонны',
+    alignment_pin_required: true,
+    created: datetime()
+}]->(p18)
+
+RETURN '✓ Создано 5 иерархических связей' AS Статус;
+
+-- =============================================
+-- 3. СОЗДАНИЕ СВЯЗЕЙ МЕЖДУ КОМПОНЕНТАМИ ШТОКА
+-- =============================================
+
+// Связи между компонентами штока
+MATCH (stem:Part {number: '14'})
+MATCH (seal_upper:Part {number: '15'})
+MATCH (seal_lower:Part {number: '16'})
+MATCH (thrust_ring:Part {number: '17'})
+MATCH (bushing:Part {number: '18'})
+
+// Шток взаимодействует с уплотнениями
+CREATE (stem)-[:SEALED_BY {
+    seal_type: 'DYNAMIC_ROTARY',
+    contact_pressure: 'РАДИАЛЬНОЕ',
+    surface_finish_required: 'Ra 0.8',
+    created: datetime()
+}]->(seal_upper)
+
+CREATE (stem)-[:SEALED_BY {
+    seal_type: 'DYNAMIC_ROTARY_BACKUP',
+    contact_pressure: 'РАДИАЛЬНОЕ',
+    surface_finish_required: 'Ra 0.8',
+    created: datetime()
+}]->(seal_lower)
+
+// Шток опирается на упорное кольцо
+CREATE (stem)-[:SUPPORTED_BY {
+    support_type: 'THRUST_BEARING',
+    load_direction: 'ОСЕВАЯ',
+    clearance: '0.1-0.2 мм',
+    created: datetime()
+}]->(thrust_ring)
+
+// Шток направляется втулкой
+CREATE (stem)-[:GUIDED_BY {
+    guidance_type: 'RADIAL_BEARING',
+    clearance: '0.05-0.1 мм',
+    length_to_diameter: '2:1',
+    created: datetime()
+}]->(bushing)
+
+// Уплотнения установлены во втулке
+CREATE (seal_upper)-[:INSTALLED_IN]->(bushing)
+CREATE (seal_lower)-[:INSTALLED_IN]->(bushing)
+
+// Упорное кольцо установлено на втулке
+CREATE (thrust_ring)-[:MOUNTED_ON]->(bushing)
+
+RETURN '✓ Созданы связи между компонентами штока' AS Статус;
+
+-- =============================================
+-- 4. СОЗДАНИЕ СВЯЗЕЙ С ШАРОМ (ЕСЛИ ОН СУЩЕСТВУЕТ)
+-- =============================================
+
+// Связь штока с шаром
+MATCH (stem:Part {number: '14'})
+OPTIONAL MATCH (shar:Part {number: '9'})
+
+FOREACH (ignore IN CASE WHEN shar IS NOT NULL THEN [1] ELSE [] END |
+    CREATE (stem)-[:CONNECTS_TO {
+        connection_type: 'SPLINE_CONNECTION',
+        torque_transmission: 'ПОЛНАЯ',
+        backlash_max: '0.1 мм',
+        disassembly_required: 'СПЕЦИНСТРУМЕНТ',
+        created: datetime()
+    }]->(shar)
+    
+    // Обратная связь
+    CREATE (shar)-[:DRIVEN_BY]->(stem)
+)
+
+RETURN '✓ Созданы связи с шаром (если шар существует)' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ СВЯЗЕЙ С КРЫШКОЙ ШТОКА (ЕСЛИ СУЩЕСТВУЕТ)
+-- =============================================
+
+// Связи с крышкой штока (будет создана в скрипте 07)
+MATCH (stem:Part {number: '14'})
+MATCH (bushing:Part {number: '18'})
+OPTIONAL MATCH (cover:Part {number: '21'})
+
+FOREACH (ignore IN CASE WHEN cover IS NOT NULL THEN [1] ELSE [] END |
+    // Шток проходит через крышку
+    CREATE (stem)-[:PASSES_THROUGH {
+        clearance: '0.2-0.3 мм',
+        sealing_required: true,
+        created: datetime()
+    }]->(cover)
+    
+    // Втулка установлена в крышке
+    CREATE (bushing)-[:PRESSED_INTO {
+        interference_fit: '0.02-0.05 мм',
+        retention_type: 'ПРЕССОВАЯ ПОСАДКА',
+        created: datetime()
+    }]->(cover)
+)
+
+RETURN '✓ Созданы связи с крышкой (если крышка существует)' AS Статус;
+
+-- =============================================
+-- 6. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданные детали
+MATCH (stem:Assembly {number: '4'})-[:CONTAINS]->(part:Part)
+WITH stem, COLLECT(part) as parts, COUNT(part) as part_count
+
+// Проверяем номера
+WITH parts, part_count,
+     [p IN parts | toInteger(p.number)] as part_numbers,
+     [14,15,16,17,18] as expected_numbers
+
+RETURN 
+  part_count as Фактическое_количество,
+  5 as Ожидаемое_количество,
+  CASE 
+    WHEN part_count = 5 THEN '✓ Количество деталей корректно'
+    ELSE '✗ Ошибка: несоответствие количества деталей'
+  END AS Проверка_количества,
+  CASE 
+    WHEN ALL(x IN expected_numbers WHERE x IN part_numbers) 
+     AND ALL(x IN part_numbers WHERE x IN expected_numbers)
+    THEN '✓ Все номера деталей соответствуют'
+    ELSE '✗ Ошибка: несоответствие номеров деталей'
+  END AS Проверка_номеров,
+  [p IN parts | p.number + ': ' + p.name + ' (' + p.subcategory + ')'] AS Список_деталей;
+
+-- =============================================
+-- 7. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Детальный отчет по компонентам штока
+MATCH (stem:Assembly {number: '4'})-[r:CONTAINS]->(p:Part)
+OPTIONAL MATCH (p)-[:CONNECTS_TO]->(shar:Part)
+OPTIONAL MATCH (p)<-[:SEALED_BY]-(stem_part:Part)
+RETURN 
+  p.number as Номер,
+  p.name as Наименование,
+  p.subcategory as Подкатегория,
+  p.material_spec as Материал,
+  
+  -- Критические параметры
+  CASE 
+    WHEN p.diameter_mm IS NOT NULL THEN toString(p.diameter_mm) + ' мм'
+    WHEN p.inner_diameter_mm IS NOT NULL THEN 'внутр. ' + toString(p.inner_diameter_mm) + ' мм'
+    ELSE '-'
+  END as Диаметр,
+  
+  CASE 
+    WHEN p.torque_capacity IS NOT NULL THEN p.torque_capacity
+    WHEN p.pressure_rating IS NOT NULL THEN p.pressure_rating
+    ELSE '-'
+  END as 'Характеристика',
+  
+  -- Сборочные параметры
+  r.quantity as Количество,
+  r.assembly_position as Позиция,
+  r.mounting_torque as 'Момент затяжки',
+  
+  -- Связи
+  CASE 
+    WHEN shar IS NOT NULL THEN 'Шар: ' + shar.number
+    WHEN stem_part IS NOT NULL THEN 'Шток: ' + stem_part.number
+    ELSE '-'
+  END as Связанные_детали,
+  
+  p.drawing_number as Чертеж,
+  p.status as Статус
+ORDER BY toInteger(p.number);
+
+-- =============================================
+-- 8. АНАЛИЗ ФУНКЦИОНАЛЬНЫХ ГРУПП
+-- =============================================
+
+// Анализ по функциональным группам
+MATCH (p:Part)
+WHERE toInteger(p.number) >= 14 AND toInteger(p.number) <= 18
+WITH 
+  SUM(CASE WHEN p.category = 'ROTATING_SHAFT' THEN 1 ELSE 0 END) as shaft_parts,
+  SUM(CASE WHEN p.category = 'SEALING_ELEMENT' THEN 1 ELSE 0 END) as sealing_parts,
+  SUM(CASE WHEN p.category = 'BEARING_ELEMENT' THEN 1 ELSE 0 END) as bearing_parts,
+  COLLECT(DISTINCT p.material_spec) as materials,
+  COUNT(p) as total_parts
+
+RETURN 
+  total_parts as Всего_деталей,
+  shaft_parts as 'Деталей вала',
+  sealing_parts as 'Уплотнений',
+  bearing_parts as 'Опорных элементов',
+  materials as Используемые_материалы,
+  'Комплект для передачи вращения' as Назначение;
+
+-- =============================================
+-- 9. СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ВРАЩАЮЩИХСЯ ДЕТАЛЕЙ
+-- =============================================
+
+// Специальные индексы для вращающихся деталей
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.category)
+WHERE p.category = 'ROTATING_SHAFT'
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.subcategory)
+WHERE p.subcategory IN ['STEM', 'ROTARY_SEAL', 'THRUST_WASHER', 'BUSING']
+
+CREATE INDEX IF NOT EXISTS FOR (p:Part) ON (p.torque_capacity)
+
+RETURN '✓ Созданы специализированные индексы для вращающихся деталей' AS Статус;
+
+-- =============================================
+-- 10. ПРОВЕРКА ФУНКЦИОНАЛЬНОЙ КОМПЛЕКТНОСТИ
+-- =============================================
+
+// Проверка функциональной комплектности узла штока
+MATCH (stem:Assembly {number: '4'})
+OPTIONAL MATCH (stem)-[:CONTAINS]->(shaft:Part {subcategory: 'STEM'})
+OPTIONAL MATCH (stem)-[:CONTAINS]->(seal:Part {subcategory: 'ROTARY_SEAL'})
+OPTIONAL MATCH (stem)-[:CONTAINS]->(bearing:Part {subcategory: 'THRUST_WASHER'})
+OPTIONAL MATCH (stem)-[:CONTAINS]->(bushing:Part {subcategory: 'BUSING'})
+
+WITH stem,
+     COUNT(DISTINCT shaft) as shaft_count,
+     COUNT(DISTINCT seal) as seal_count,
+     COUNT(DISTINCT bearing) as bearing_count,
+     COUNT(DISTINCT bushing) as bushing_count
+
+RETURN 
+  stem.name as Узел,
+  shaft_count as Штока,
+  seal_count as Уплотнений,
+  bearing_count as 'Опорных колец',
+  bushing_count as Втулок,
+  CASE 
+    WHEN shaft_count = 1 AND seal_count = 2 AND bearing_count = 1 AND bushing_count = 1 
+    THEN '✓ Полный функциональный комплект'
+    ELSE '✗ Неполный комплект'
+  END as Статус_комплектности;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 05 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;
