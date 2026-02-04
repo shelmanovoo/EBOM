@@ -1,0 +1,278 @@
+-- =============================================
+-- Создание структуры сборок EBOM шарового крана
+-- Версия: 1.0
+-- Дата: 2024
+-- =============================================
+
+-- Описание:
+-- Этот скрипт создает корневую сборку шарового крана
+-- и все основные сборочные узлы первого уровня.
+-- Всего создается 11 узлов Assembly:
+--   - 1 корневая сборка (шаровой кран)
+--   - 10 функциональных узлов
+
+-- =============================================
+-- 0. СОЗДАНИЕ КОРНЕВОЙ СБОРКИ - ШАРОВОЙ КРАН
+-- =============================================
+
+// Создаем корневую сборку - шаровой кран
+CREATE (top_assembly:Assembly {
+    number: '0',
+    name: 'Шаровой кран — сборочная единица',
+    description: 'Корневая сборка EBOM шарового крана',
+    type: 'ROOT_ASSEMBLY',
+    created: datetime(),
+    version: '1.0'
+})
+
+// Добавляем технические атрибуты (как пример)
+SET top_assembly.DN = 'DN50',      -- Номинальный диаметр (атрибут, не деталь)
+    top_assembly.PN = 'PN16',      -- Номинальное давление (атрибут, не деталь)
+    top_assembly.connection_type = 'Фланец',  -- Тип присоединения
+    top_assembly.material_group = 'Сталь',    -- Группа материалов
+    top_assembly.temperature_min = '-20 °C',  -- Минимальная температура
+    top_assembly.temperature_max = '150 °C'   -- Максимальная температура
+
+RETURN '✓ Создана корневая сборка: ' + top_assembly.name + ' (номер: ' + top_assembly.number + ')'
+AS Статус;
+
+-- =============================================
+-- 1. СОЗДАНИЕ ОСНОВНЫХ СБОРОЧНЫХ УЗЛОВ
+-- =============================================
+
+// Создаем 10 основных сборочных узлов
+CREATE (assembly_1:Assembly {
+    number: '1',
+    name: 'Корпус',
+    description: 'Основной корпус шарового крана',
+    function: 'Обеспечение прочности и герметичности',
+    weight_category: 'HEAVY',
+    created: datetime()
+})
+
+CREATE (assembly_2:Assembly {
+    number: '2',
+    name: 'Запорный элемент',
+    description: 'Узел запорного элемента (шара)',
+    function: 'Перекрытие потока рабочей среды',
+    weight_category: 'MEDIUM',
+    created: datetime()
+})
+
+CREATE (assembly_3:Assembly {
+    number: '3',
+    name: 'Седла и уплотнения шара',
+    description: 'Узел седел и уплотнений шарового элемента',
+    function: 'Герметизация в закрытом положении',
+    weight_category: 'LIGHT',
+    created: datetime()
+})
+
+CREATE (assembly_4:Assembly {
+    number: '4',
+    name: 'Шток (узел передачи вращения)',
+    description: 'Узел передачи вращения от привода к шару',
+    function: 'Передача крутящего момента',
+    weight_category: 'MEDIUM',
+    created: datetime()
+})
+
+CREATE (assembly_5:Assembly {
+    number: '5',
+    name: 'Сальниковый узел',
+    description: 'Узел сальникового уплотнения штока',
+    function: 'Герметизация штока',
+    weight_category: 'LIGHT',
+    created: datetime()
+})
+
+CREATE (assembly_6:Assembly {
+    number: '6',
+    name: 'Крышка штока',
+    description: 'Узел крышки сальниковой камеры',
+    function: 'Защита и фиксация сальникового узла',
+    weight_category: 'LIGHT',
+    created: datetime()
+})
+
+CREATE (assembly_7:Assembly {
+    number: '7',
+    name: 'Узел управления',
+    description: 'Узел ручного или автоматического управления',
+    function: 'Управление положением крана',
+    weight_category: 'LIGHT',
+    created: datetime()
+})
+
+CREATE (assembly_8:Assembly {
+    number: '8',
+    name: 'Присоединительные элементы',
+    description: 'Узел присоединения к трубопроводу',
+    function: 'Подключение к системе',
+    weight_category: 'MEDIUM',
+    created: datetime()
+})
+
+CREATE (assembly_9:Assembly {
+    number: '9',
+    name: 'Маркировка и сервис',
+    description: 'Узел маркировки и сервисных элементов',
+    function: 'Идентификация и обслуживание',
+    weight_category: 'LIGHT',
+    created: datetime()
+})
+
+CREATE (assembly_10:Assembly {
+    number: '10',
+    name: 'Нормируемые материалы',
+    description: 'Нормируемые материалы для сборки',
+    function: 'Обеспечение технологических процессов',
+    weight_category: 'CONSUMABLE',
+    created: datetime()
+})
+
+RETURN '✓ Создано 10 сборочных узлов' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИЕРАРХИЧЕСКИХ СВЯЗЕЙ
+-- =============================================
+
+// Находим все созданные узлы
+MATCH (top:Assembly {number: '0'})
+MATCH (a1:Assembly {number: '1'})
+MATCH (a2:Assembly {number: '2'})
+MATCH (a3:Assembly {number: '3'})
+MATCH (a4:Assembly {number: '4'})
+MATCH (a5:Assembly {number: '5'})
+MATCH (a6:Assembly {number: '6'})
+MATCH (a7:Assembly {number: '7'})
+MATCH (a8:Assembly {number: '8'})
+MATCH (a9:Assembly {number: '9'})
+MATCH (a10:Assembly {number: '10'})
+
+// Создаем иерархические связи
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 1
+}]->(a1)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 2
+}]->(a2)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 3
+}]->(a3)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 4
+}]->(a4)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 5
+}]->(a5)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 6
+}]->(a6)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 7
+}]->(a7)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 8
+}]->(a8)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 9
+}]->(a9)
+
+CREATE (top)-[:CONTAINS {
+    relationship_type: 'HIERARCHICAL',
+    created: datetime(),
+    sequence: 10
+}]->(a10)
+
+RETURN '✓ Создано 10 иерархических связей' AS Статус;
+
+-- =============================================
+-- 3. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем количество созданных Assembly
+MATCH (a:Assembly)
+WITH COLLECT(a) as assemblies, COUNT(a) as assembly_count
+
+// Проверяем количество связей CONTAINS
+MATCH ()-[r:CONTAINS]->()
+WITH assemblies, assembly_count, COUNT(r) as relationship_count
+
+// Выводим отчет
+RETURN 
+  assembly_count AS Всего_сборок,
+  relationship_count AS Всего_связей,
+  CASE 
+    WHEN assembly_count = 11 THEN '✓ Количество сборок корректно'
+    ELSE '✗ Ошибка: ожидается 11 сборок'
+  END AS Проверка_сборок,
+  CASE 
+    WHEN relationship_count = 10 THEN '✓ Количество связей корректно'
+    ELSE '✗ Ошибка: ожидается 10 связей'
+  END AS Проверка_связей,
+  [a IN assemblies | a.number + ': ' + a.name] AS Список_сборок;
+
+-- =============================================
+-- 4. ДОПОЛНИТЕЛЬНЫЕ ИНДЕКСЫ И ОГРАНИЧЕНИЯ
+-- =============================================
+
+// Создаем индексы для быстрого поиска
+CREATE INDEX assembly_number IF NOT EXISTS FOR (a:Assembly) ON (a.number);
+CREATE INDEX assembly_name IF NOT EXISTS FOR (a:Assembly) ON (a.name);
+
+// Создаем ограничение уникальности номера сборки
+CREATE CONSTRAINT unique_assembly_number IF NOT EXISTS 
+FOR (a:Assembly) REQUIRE a.number IS UNIQUE;
+
+RETURN '✓ Созданы индексы и ограничения для Assembly' AS Статус;
+
+-- =============================================
+-- 5. ЭКСПОРТ ДАННЫХ ДЛЯ ОТЧЕТА
+-- =============================================
+
+// Экспорт структуры в табличном виде
+MATCH (parent:Assembly {number: '0'})-[r:CONTAINS]->(child:Assembly)
+RETURN 
+  'EBOM Шаровой кран' as Проект,
+  'Уровень 1' as Уровень_иерархии,
+  parent.number as Родительский_номер,
+  parent.name as Родительское_наименование,
+  '→' as Связь,
+  child.number as Номер_сборки,
+  child.name as Наименование_сборки,
+  child.description as Описание,
+  r.sequence as Порядковый_номер
+ORDER BY r.sequence;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 01 ВЫПОЛНЕН УСПЕШНО' AS ФИНАЛЬНЫЙ_СТАТУС;
