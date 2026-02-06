@@ -1,0 +1,675 @@
+-- =============================================
+-- Создание структуры релизов и исполнений EBOM
+-- Версия: 1.0
+-- Дата: 2026
+-- =============================================
+
+-- Описание:
+-- Этот скрипт добавляет структуру управления конфигурацией:
+-- 1. Релиз (Release) - версия изделия
+-- 2. Исполнения (Variants) - варианты исполнения изделия
+
+-- =============================================
+-- 0. ПРОВЕРКА СУЩЕСТВОВАНИЯ БАЗОВОЙ СТРУКТУРЫ
+-- =============================================
+
+// Проверяем наличие базовой структуры EBOM
+MATCH (top:Assembly {number: '0'})
+WITH COUNT(top) as exists
+WHERE exists = 0
+RETURN '❌ ОШИБКА: Базовая структура EBOM не найдена. Выполните сначала все скрипты создания EBOM.' as Ошибка
+
+-- =============================================
+-- 1. СОЗДАНИЕ РЕЛИЗА ИЗДЕЛИЯ
+-- =============================================
+
+// Создаем узел Релиза
+CREATE (release_1:Release {
+    release_id: 'REL-2026-001',
+    name: 'Релиз 1.0 - Базовое исполнение',
+    description: 'Первая промышленная версия шарового крана DN50 PN16',
+    
+    -- Технические характеристики релиза
+    nominal_diameter: 'DN50',
+    nominal_pressure: 'PN16',
+    temperature_range: '-40°C ... +150°C',
+    connection_type: 'ФЛАНЦЕВЫЙ',
+    flange_standard: 'ГОСТ 12820-80',
+    
+    -- Версионность
+    version: '1.0.0',
+    version_scheme: 'MAJOR.MINOR.PATCH',
+    major_version: 1,
+    minor_version: 0,
+    patch_version: 0,
+    
+    -- Статус и даты
+    status: 'RELEASED',
+    release_date: date('2026-01-15'),
+    effective_date: date('2026-02-01'),
+    end_of_life_date: date('2036-01-15'),
+    
+    -- Управление изменениями
+    change_number: 'ECN-2026-001',
+    change_description: 'Первоначальный выпуск',
+    approval_status: 'APPROVED',
+    approved_by: 'Главный конструктор',
+    
+    -- Производственные параметры
+    manufacturing_plant: 'ЗАВОД №1',
+    production_line: 'ЛИНИЯ А',
+    quality_class: 'КЛАСС А',
+    
+    created: datetime(),
+    created_by: 'Система PLM',
+    
+    -- Дополнительные атрибуты
+    warranty_period: '24 месяца',
+    certification: 'СЕРТИФИКАТ СООТВЕТСТВИЯ ТР ТС 010/2011',
+    documentation_set: ['ПАСПОРТ', 'РУКОВОДСТВО', 'ЧЕРТЕЖИ'],
+    export_control: 'НЕ ТРЕБУЕТСЯ'
+})
+
+RETURN '✓ Создан Релиз 1.0' AS Статус;
+
+-- =============================================
+-- 2. СОЗДАНИЕ ИСПОЛНЕНИЙ (ВАРИАНТОВ)
+-- =============================================
+
+// Исполнение 1: Стандартное фланцевое исполнение
+CREATE (variant_1:Variant {
+    variant_id: 'VAR-STD-FLANGE',
+    name: 'Стандартное фланцевое исполнение',
+    description: 'Базовое исполнение с фланцевыми соединениями под паронитовые прокладки',
+    
+    -- Технические особенности
+    connection_type: 'ФЛАНЦЕВЫЙ',
+    flange_type: 'ПЛОСКИЙ ПРИВАРНОЙ',
+    gasket_type: 'ПАРОНИТ ПМБ',
+    sealing_surface: 'ГЛУХОЙ ПАЗ',
+    
+    -- Материалы
+    body_material: 'СТАЛЬ 20',
+    ball_material: 'СТАЛЬ 12Х18Н10Т',
+    stem_material: 'СТАЛЬ 20Х13',
+    seats_material: 'PTFE+25% СТЕКЛОВОЛОКНО',
+    
+    -- Эксплуатационные параметры
+    media_compatibility: ['ВОДА', 'ПАР', 'СЖАТЫЙ ВОЗДУХ', 'НЕФТЕПРОДУКТЫ'],
+    hazardous_media: false,
+    fire_safe: true,
+    low_temperature: false,
+    
+    -- Конструктивные особенности
+    full_ported: true,
+    reduced_port: false,
+    anti_static: true,
+    fire_safe_design: false,
+    
+    -- Стандарты и сертификаты
+    standards: ['ГОСТ 33259-2015', 'ГОСТ 9544-2015', 'ГОСТ 12815-80'],
+    certificates: ['ТР ТС 010/2011', 'ТР ТС 032/2013'],
+    
+    -- Кодировка
+    catalog_number: 'KSh-50-16-F-PN',
+    ordering_code: '5016FPN001',
+    
+    created: datetime(),
+    status: 'ACTIVE',
+    availability: 'СТАНДАРТНАЯ ПОСТАВКА'
+})
+
+// Исполнение 2: Исполнение для химических сред
+CREATE (variant_2:Variant {
+    variant_id: 'VAR-CHEM-FLANGE',
+    name: 'Исполнение для химических сред',
+    description: 'Специальное исполнение с улучшенной коррозионной стойкостью для агрессивных сред',
+    
+    -- Технические особенности
+    connection_type: 'ФЛАНЦЕВЫЙ',
+    flange_type: 'ПЛОСКИЙ ПРИВАРНОЙ',
+    gasket_type: 'PTFE ОБВЯЗАННАЯ',
+    sealing_surface: 'ГЛУХОЙ ПАЗ С PTFE ВСТАВКОЙ',
+    
+    -- Материалы (улучшенные)
+    body_material: 'СТАЛЬ 12Х18Н10Т (AISI 304)',
+    ball_material: 'СТАЛЬ 10Х17Н13М2Т (AISI 316Ti)',
+    stem_material: 'СТАЛЬ 14Х17Н2 (AISI 431)',
+    seats_material: 'PTFE+15% ГРАФИТ',
+    gaskets_material: 'PTFE ФОЛИРОВАННАЯ',
+    
+    -- Эксплуатационные параметры
+    media_compatibility: ['КИСЛОТЫ', 'ЩЕЛОЧИ', 'РАСТВОРИТЕЛИ', 'ХЛОРСОДЕРЖАЩИЕ СРЕДЫ'],
+    hazardous_media: true,
+    fire_safe: true,
+    low_temperature: false,
+    
+    -- Специальные обработки
+    internal_coating: 'ЭПОКСИДНОЕ ПОКРЫТИЕ',
+    coating_thickness: '250-300 мкм',
+    surface_finish: 'ЭЛЕКТРОПОЛИРОВКА',
+    roughness: 'Ra 0.4',
+    
+    -- Конструктивные особенности
+    full_ported: true,
+    extended_bonnet: true,
+    double_block_and_bleed: false,
+    cavity_filler: 'АНТИСЕПТИЧЕСКАЯ ПАСТА',
+    
+    -- Стандарты и сертификаты
+    standards: ['ГОСТ 33259-2015', 'ASME B16.34', 'NACE MR0175'],
+    certificates: ['ТР ТС 010/2011', 'СЕРТИФИКАТ NACE', 'CERTIFICATE 3.1'],
+    
+    -- Кодировка
+    catalog_number: 'KSh-50-16-F-CHEM',
+    ordering_code: '5016FCHEM001',
+    
+    created: datetime(),
+    status: 'ACTIVE',
+    availability: 'ПОД ЗАКАЗ (30 ДНЕЙ)'
+})
+
+RETURN '✓ Создано 2 исполнения (варианта)' AS Статус;
+
+-- =============================================
+-- 3. СВЯЗЫВАНИЕ РЕЛИЗА С БАЗОВОЙ СБОРКОЙ
+-- =============================================
+
+// Связываем релиз с базовой сборкой
+MATCH (top:Assembly {number: '0'})
+MATCH (release:Release {release_id: 'REL-2026-001'})
+
+CREATE (top)-[:HAS_RELEASE {
+    relationship_type: 'CONFIGURATION',
+    is_current: true,
+    is_default: true,
+    effectivity_start: date('2026-02-01'),
+    effectivity_end: date('2036-01-15'),
+    created: datetime()
+}]->(release)
+
+// Создаем обратную связь
+CREATE (release)-[:APPLIES_TO]->(top)
+
+RETURN '✓ Релиз связан с базовой сборкой' AS Статус;
+
+-- =============================================
+-- 4. СВЯЗЫВАНИЕ ИСПОЛНЕНИЙ С РЕЛИЗОМ
+-- =============================================
+
+// Связываем исполнения с релизом
+MATCH (release:Release {release_id: 'REL-2026-001'})
+MATCH (variant1:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (variant2:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+
+CREATE (release)-[:INCLUDES_VARIANT {
+    sequence: 1,
+    is_standard: true,
+    percentage_of_sales: 85,
+    lead_time_days: 14,
+    created: datetime()
+}]->(variant1)
+
+CREATE (release)-[:INCLUDES_VARIANT {
+    sequence: 2,
+    is_standard: false,
+    percentage_of_sales: 15,
+    lead_time_days: 30,
+    created: datetime()
+}]->(variant2)
+
+RETURN '✓ Исполнения связаны с релизом' AS Статус;
+
+-- =============================================
+-- 5. СОЗДАНИЕ ОТЛИЧИЙ МЕЖДУ ИСПОЛНЕНИЯМИ
+-- =============================================
+
+// Создаем узлы отличий между исполнениями
+CREATE (difference_1:Difference {
+    difference_id: 'DIFF-001',
+    title: 'Различие в материалах корпуса',
+    description: 'Стандартное исполнение использует сталь 20, химическое - нержавеющую сталь AISI 304',
+    
+    affected_parts: ['2', '3', '31', '32'], // Корпусные детали и патрубки
+    standard_variant_value: 'СТАЛЬ 20',
+    special_variant_value: 'СТАЛЬ 12Х18Н10Т (AISI 304)',
+    
+    impact: {
+        cost: '+40%',
+        weight: 'БЕЗ ИЗМЕНЕНИЙ',
+        corrosion_resistance: 'УЛУЧШЕННАЯ',
+        temperature_range: 'РАСШИРЕННЫЙ'
+    },
+    
+    verification_required: true,
+    test_requirement: 'КОРРОЗИОННОЕ ИСПЫТАНИЕ',
+    
+    created: datetime()
+})
+
+CREATE (difference_2:Difference {
+    difference_id: 'DIFF-002',
+    title: 'Различие в материалах шара',
+    description: 'Стандартное исполнение - сталь 12Х18Н10Т, химическое - сталь 10Х17Н13М2Т с улучшенной стойкостью',
+    
+    affected_parts: ['9'], // Шар запорный
+    standard_variant_value: 'СТАЛЬ 12Х18Н10Т',
+    special_variant_value: 'СТАЛЬ 10Х17Н13М2Т (AISI 316Ti)',
+    
+    impact: {
+        cost: '+60%',
+        hardness: 'ВЫШЕ',
+        corrosion_resistance: 'ВЫСОКАЯ К ТОЧЕЧНОЙ КОРРОЗИИ',
+        machining_complexity: 'ВЫШЕ'
+    },
+    
+    special_treatment: 'ЭЛЕКТРОПОЛИРОВКА',
+    surface_roughness: 'Ra 0.2',
+    
+    created: datetime()
+})
+
+CREATE (difference_3:Difference {
+    difference_id: 'DIFF-003',
+    title: 'Различие в уплотнениях',
+    description: 'Химическое исполнение использует PTFE-обвязанные прокладки вместо паронитовых',
+    
+    affected_parts: ['4', '22'], // Прокладки
+    standard_variant_value: 'ПАРОНИТ ПМБ',
+    special_variant_value: 'PTFE ОБВЯЗАННАЯ',
+    
+    impact: {
+        cost: '+25%',
+        chemical_resistance: 'УНИВЕРСАЛЬНАЯ',
+        temperature_range: '-200°C ... +260°C',
+        compression_set: 'НИЖЕ'
+    },
+    
+    standards: ['ГОСТ 15180-86', 'ASME B16.21'],
+    
+    created: datetime()
+})
+
+// Связываем отличия с исполнениями
+MATCH (variant1:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (variant2:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+MATCH (diff1:Difference {difference_id: 'DIFF-001'})
+MATCH (diff2:Difference {difference_id: 'DIFF-002'})
+MATCH (diff3:Difference {difference_id: 'DIFF-003'})
+
+CREATE (variant1)-[:HAS_FEATURE]->(diff1)
+CREATE (variant2)-[:HAS_FEATURE]->(diff1)
+CREATE (diff1)-[:DIFFERENTIATES]->(variant2)
+
+CREATE (variant1)-[:HAS_FEATURE]->(diff2)
+CREATE (variant2)-[:HAS_FEATURE]->(diff2)
+CREATE (diff2)-[:DIFFERENTIATES]->(variant2)
+
+CREATE (variant1)-[:HAS_FEATURE]->(diff3)
+CREATE (variant2)-[:HAS_FEATURE]->(diff3)
+CREATE (diff3)-[:DIFFERENTIATES]->(variant2)
+
+RETURN '✓ Созданы и связаны отличия между исполнениями' AS Статус;
+
+-- =============================================
+-- 6. СОЗДАНИЕ СВЯЗЕЙ ИСПОЛНЕНИЙ С ДЕТАЛЯМИ
+-- =============================================
+
+// Связываем стандартное исполнение с деталями
+MATCH (variant:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (parts:Part)
+WHERE parts.number IN ['2', '3', '9', '31', '32'] // Основные детали
+
+CREATE (variant)-[:USES_PART {
+    usage_type: 'STANDARD',
+    quantity: 1,
+    effectivity: 'ПОСТОЯННО',
+    created: datetime()
+}]->(parts)
+
+// Создаем специфичные детали для химического исполнения
+CREATE (p9_chem:Part {
+    number: '9-CHEM',
+    name: 'Шар запорный (химическое исполнение)',
+    description: 'Шар из стали 10Х17Н13М2Т с электрополировкой для химических сред',
+    material_spec: 'Сталь 10Х17Н13М2Т (AISI 316Ti)',
+    material_grade: 'AISI 316Ti',
+    surface_finish: 'ЭЛЕКТРОПОЛИРОВКА',
+    hardness: 'HRC 48-52',
+    corrosion_resistance: 'ВЫСОКАЯ К ТОЧЕЧНОЙ КОРРОЗИИ',
+    created: datetime(),
+    status: 'VARIANT_SPECIFIC',
+    category: 'SHUTOFF_ELEMENT',
+    drawing_number: 'КК-9-001-CHEM'
+})
+
+CREATE (p2_chem:Part {
+    number: '2-CHEM',
+    name: 'Корпус левый (химическое исполнение)',
+    description: 'Корпус из нержавеющей стали AISI 304 для химических сред',
+    material_spec: 'Сталь 12Х18Н10Т (AISI 304)',
+    material_grade: 'AISI 304',
+    created: datetime(),
+    status: 'VARIANT_SPECIFIC',
+    category: 'BASIC_PART',
+    drawing_number: 'КК-2-001-CHEM'
+})
+
+// Связываем специфичные детали с химическим исполнением
+MATCH (variant_chem:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+CREATE (variant_chem)-[:USES_PART {
+    usage_type: 'VARIANT_SPECIFIC',
+    quantity: 1,
+    replaces: '9', // Заменяет стандартный шар
+    created: datetime()
+}]->(p9_chem)
+
+CREATE (variant_chem)-[:USES_PART {
+    usage_type: 'VARIANT_SPECIFIC',
+    quantity: 1,
+    replaces: '2', // Заменяет стандартный корпус
+    created: datetime()
+}]->(p2_chem)
+
+RETURN '✓ Созданы связи исполнений с деталями' AS Статус;
+
+-- =============================================
+-- 7. СОЗДАНИЕ СТРУКТУРЫ КОНФИГУРАЦИИ
+-- =============================================
+
+// Создаем узел конфигурации продукта
+CREATE (product_config:ProductConfiguration {
+    config_id: 'CONFIG-001',
+    name: 'Шаровой кран DN50 PN16 - Конфигуратор',
+    description: 'Конфигурация для выбора исполнений шарового крана',
+    
+    -- Опции конфигурации
+    configuration_options: [
+        {
+            option_id: 'OPT-001',
+            name: 'ТИП ИСПОЛНЕНИЯ',
+            description: 'Выбор основного исполнения',
+            values: [
+                {value: 'VAR-STD-FLANGE', label: 'Стандартное фланцевое', default: true},
+                {value: 'VAR-CHEM-FLANGE', label: 'Для химических сред', default: false}
+            ],
+            required: true,
+            selection_type: 'SINGLE'
+        },
+        {
+            option_id: 'OPT-002',
+            name: 'ТИП УПРАВЛЕНИЯ',
+            description: 'Выбор типа привода',
+            values: [
+                {value: 'MANUAL', label: 'Ручное (рычаг)', default: true},
+                {value: 'GEAR', label: 'Редукторный', default: false},
+                {value: 'ACTUATOR', label: 'Пневмопривод', default: false}
+            ],
+            required: true,
+            selection_type: 'SINGLE'
+        },
+        {
+            option_id: 'OPT-003',
+            name: 'КОНСЕРВАЦИЯ',
+            description: 'Тип консервационного покрытия',
+            values: [
+                {value: 'STANDARD', label: 'Стандартная', default: true},
+                {value: 'EXTENDED', label: 'Усиленная для морского климата', default: false}
+            ],
+            required: false,
+            selection_type: 'SINGLE'
+        }
+    ],
+    
+    -- Правила конфигурации
+    configuration_rules: [
+        'IF VAR-CHEM-FLANGE THEN MATERIAL=AISI304',
+        'IF CHEMICAL_MEDIA THEN VAR-CHEM-FLANGE REQUIRED',
+        'IF SEA_CLIMATE THEN EXTENDED_CONSERVATION RECOMMENDED'
+    ],
+    
+    -- Совместимости
+    compatibility_matrix: {
+        'VAR-STD-FLANGE': ['MANUAL', 'GEAR', 'STANDARD', 'EXTENDED'],
+        'VAR-CHEM-FLANGE': ['MANUAL', 'GEAR', 'ACTUATOR', 'STANDARD', 'EXTENDED']
+    },
+    
+    created: datetime(),
+    status: 'ACTIVE'
+})
+
+// Связываем конфигурацию с релизом
+MATCH (release:Release {release_id: 'REL-2026-001'})
+CREATE (release)-[:HAS_CONFIGURATION {
+    is_default_configurator: true,
+    created: datetime()
+}]->(product_config)
+
+// Связываем конфигурацию с исполнениями
+MATCH (variant1:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (variant2:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+CREATE (product_config)-[:CONFIGURES]->(variant1)
+CREATE (product_config)-[:CONFIGURES]->(variant2)
+
+RETURN '✓ Создана структура конфигурации' AS Статус;
+
+-- =============================================
+-- 8. СОЗДАНИЕ ДОКУМЕНТАЦИИ ДЛЯ ИСПОЛНЕНИЙ
+-- =============================================
+
+// Создаем документацию для исполнений
+CREATE (doc_std:Documentation {
+    doc_id: 'DOC-STD-001',
+    document_type: 'ПАСПОРТ',
+    title: 'Паспорт шарового крана DN50 PN16 (стандартное исполнение)',
+    document_number: 'ПС-КШ-50-16-СТД',
+    revision: 'A',
+    issue_date: date('2026-01-15'),
+    language: 'РУССКИЙ',
+    
+    content_summary: 'Техническое описание, параметры, инструкция по монтажу и эксплуатации',
+    pages: 24,
+    format: 'PDF/A',
+    file_size_mb: 5.2,
+    
+    applicable_variants: ['VAR-STD-FLANGE'],
+    standards_referenced: ['ГОСТ 33259-2015', 'ГОСТ 9544-2015'],
+    
+    created: datetime()
+})
+
+CREATE (doc_chem:Documentation {
+    doc_id: 'DOC-CHEM-001',
+    document_type: 'ПАСПОРТ',
+    title: 'Паспорт шарового крана DN50 PN16 (химическое исполнение)',
+    document_number: 'ПС-КШ-50-16-ХИМ',
+    revision: 'A',
+    issue_date: date('2026-01-15'),
+    language: 'РУССКИЙ',
+    
+    content_summary: 'Техническое описание для агрессивных сред, особые требования',
+    pages: 28,
+    format: 'PDF/A',
+    file_size_mb: 5.8,
+    
+    applicable_variants: ['VAR-CHEM-FLANGE'],
+    standards_referenced: ['ГОСТ 33259-2015', 'NACE MR0175', 'ASME B16.34'],
+    
+    special_notes: 'ТРЕБУЕТСЯ СПЕЦИАЛЬНАЯ ПОДГОТОВКА ПЕРСОНАЛА',
+    
+    created: datetime()
+})
+
+// Связываем документацию с исполнениями
+MATCH (variant1:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (variant2:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+CREATE (variant1)-[:HAS_DOCUMENTATION]->(doc_std)
+CREATE (variant2)-[:HAS_DOCUMENTATION]->(doc_chem)
+
+RETURN '✓ Создана документация для исполнений' AS Статус;
+
+-- =============================================
+-- 9. СОЗДАНИЕ ЦЕНОВОЙ ИНФОРМАЦИИ
+-- =============================================
+
+// Создаем ценовую информацию
+CREATE (price_std:PriceInformation {
+    price_id: 'PRICE-STD-001',
+    variant_id: 'VAR-STD-FLANGE',
+    currency: 'RUB',
+    unit_price: 12500.00,
+    price_valid_from: date('2026-01-01'),
+    price_valid_to: date('2026-12-31'),
+    
+    discount_categories: [
+        {quantity: 1, discount: 0},
+        {quantity: 10, discount: 5},
+        {quantity: 50, discount: 10},
+        {quantity: 100, discount: 15}
+    ],
+    
+    incoterms: 'EXW',
+    delivery_lead_time: '14 РАБОЧИХ ДНЕЙ',
+    minimum_order_quantity: 1,
+    
+    created: datetime()
+})
+
+CREATE (price_chem:PriceInformation {
+    price_id: 'PRICE-CHEM-001',
+    variant_id: 'VAR-CHEM-FLANGE',
+    currency: 'RUB',
+    unit_price: 21000.00,
+    price_valid_from: date('2026-01-01'),
+    price_valid_to: date('2026-12-31'),
+    
+    discount_categories: [
+        {quantity: 1, discount: 0},
+        {quantity: 5, discount: 5},
+        {quantity: 20, discount: 10}
+    ],
+    
+    incoterms: 'EXW',
+    delivery_lead_time: '30 РАБОЧИХ ДНЕЙ',
+    minimum_order_quantity: 1,
+    
+    created: datetime()
+})
+
+// Связываем цены с исполнениями
+MATCH (variant1:Variant {variant_id: 'VAR-STD-FLANGE'})
+MATCH (variant2:Variant {variant_id: 'VAR-CHEM-FLANGE'})
+CREATE (variant1)-[:HAS_PRICE]->(price_std)
+CREATE (variant2)-[:HAS_PRICE]->(price_chem)
+
+RETURN '✓ Создана ценовая информация' AS Статус;
+
+-- =============================================
+-- 10. ПРОВЕРКА И ВАЛИДАЦИЯ
+-- =============================================
+
+// Проверяем созданную структуру
+MATCH (r:Release)
+MATCH (v:Variant)
+MATCH (c:ProductConfiguration)
+MATCH (d:Documentation)
+MATCH (p:PriceInformation)
+
+WITH 
+    COUNT(r) as releases_count,
+    COUNT(v) as variants_count,
+    COUNT(c) as configs_count,
+    COUNT(d) as docs_count,
+    COUNT(p) as prices_count
+
+RETURN 
+    'СТАТИСТИКА КОНФИГУРАЦИИ' as Раздел,
+    releases_count as Релизов,
+    variants_count as Исполнений,
+    configs_count as Конфигураторов,
+    docs_count as Документов,
+    prices_count as Ценовых_позиций,
+    CASE 
+        WHEN releases_count = 1 AND variants_count = 2 
+        THEN '✓ Структура конфигурации создана полностью'
+        ELSE '⚠ Неполная структура конфигурации'
+    END as Статус;
+
+-- =============================================
+-- 11. ЭКСПОРТ ИНФОРМАЦИИ О КОНФИГУРАЦИИ
+-- =============================================
+
+// Экспорт информации о релизе и исполнениях
+MATCH (release:Release {release_id: 'REL-2026-001'})-[rel1:INCLUDES_VARIANT]->(variant:Variant)
+OPTIONAL MATCH (variant)-[rel2:HAS_PRICE]->(price:PriceInformation)
+OPTIONAL MATCH (variant)-[rel3:HAS_DOCUMENTATION]->(doc:Documentation)
+RETURN 
+    release.release_id as ID_релиза,
+    release.name as Название_релиза,
+    release.version as Версия,
+    release.status as Статус_релиза,
+    
+    variant.variant_id as ID_исполнения,
+    variant.name as Название_исполнения,
+    variant.catalog_number as Каталожный_номер,
+    variant.availability as Доступность,
+    
+    price.unit_price as Цена,
+    price.currency as Валюта,
+    price.delivery_lead_time as Срок_поставки,
+    
+    doc.document_number as Номер_документа,
+    doc.title as Название_документа,
+    
+    rel1.percentage_of_sales as 'Доля в продажах, %'
+ORDER BY rel1.sequence;
+
+-- =============================================
+-- 12. СОЗДАНИЕ ИНДЕКСОВ ДЛЯ КОНФИГУРАЦИИ
+-- =============================================
+
+// Создаем индексы для быстрого поиска
+CREATE INDEX release_id IF NOT EXISTS FOR (r:Release) ON (r.release_id);
+CREATE INDEX release_status IF NOT EXISTS FOR (r:Release) ON (r.status);
+CREATE INDEX release_version IF NOT EXISTS FOR (r:Release) ON (r.version);
+
+CREATE INDEX variant_id IF NOT EXISTS FOR (v:Variant) ON (v.variant_id);
+CREATE INDEX variant_catalog_number IF NOT EXISTS FOR (v:Variant) ON (v.catalog_number);
+
+CREATE INDEX configuration_id IF NOT EXISTS FOR (c:ProductConfiguration) ON (c.config_id);
+
+RETURN '✓ Созданы индексы для конфигурации' AS Статус;
+
+-- =============================================
+-- 13. АНАЛИЗ СТРУКТУРЫ КОНФИГУРАЦИИ
+-- =============================================
+
+// Анализ сложности конфигурации
+MATCH (release:Release {release_id: 'REL-2026-001'})
+OPTIONAL MATCH (release)-[:INCLUDES_VARIANT]->(variant:Variant)
+OPTIONAL MATCH (variant)-[:USES_PART]->(part:Part)
+WITH release, 
+     COUNT(DISTINCT variant) as variant_count,
+     COUNT(DISTINCT part) as unique_parts_count,
+     COLLECT(DISTINCT variant.variant_id) as variant_ids
+
+RETURN 
+    'АНАЛИЗ СЛОЖНОСТИ КОНФИГУРАЦИИ' as Анализ,
+    release.release_id as Релиз,
+    release.name as Название,
+    variant_count as Количество_исполнений,
+    unique_parts_count as Уникальных_деталей,
+    variant_ids as ID_исполнений,
+    CASE 
+        WHEN variant_count = 2 AND unique_parts_count > 0 
+        THEN '✓ Конфигурация оптимальной сложности'
+        WHEN variant_count > 5 
+        THEN '⚠ Высокая сложность конфигурации'
+        ELSE 'Конфигурация стандартной сложности'
+    END as Оценка_сложности;
+
+-- =============================================
+-- КОНЕЦ СКРИПТА
+-- =============================================
+
+RETURN '✅ СКРИПТ 13 ВЫПОЛНЕН УСПЕШНО. СОЗДАНА СТРУКТУРА КОНФИГУРАЦИИ: 1 РЕЛИЗ, 2 ИСПОЛНЕНИЯ.' AS ФИНАЛЬНЫЙ_СТАТУС;
