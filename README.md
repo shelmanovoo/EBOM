@@ -4,7 +4,7 @@
 1. Назначение проекта
 
 Этот репозиторий демонстрирует полноценную инженерную модель EBOM (Engineering Bill of Materials), реализованную в виде графа знаний на базе Neo4j.
-<img width="3703" height="3748" alt="graph (9)" src="https://github.com/user-attachments/assets/396448e0-a876-4e03-838b-66f8cfd6db08" />
+<img width="3751" height="3220" alt="graph (11)" src="https://github.com/user-attachments/assets/212848f0-3386-46ca-be2f-612ade6d2d1f" />
 
 
 Проект показывает, как реальное промышленное изделие (шаровой кран DN50 PN16) может быть представлено не просто как список деталей, а как структурированная, конфигурируемая, трассируемая модель, пригодная для:
@@ -153,7 +153,8 @@ ORDER BY Уровень, toInteger(child.number)
 MATCH (p:Part {name: 'Шар запорный'})-[:HAS_REQUIREMENT]->(r:Requirement)
 RETURN p.number as Номер, p.name as Деталь, r.id as ID_Требования, r.text as Текст_Требования
 
-<img width="638" height="109" alt="image" src="https://github.com/user-attachments/assets/9239d881-4114-4881-a738-c0ff95554172" />
+<img width="3751" height="3220" alt="graph (10)" src="https://github.com/user-attachments/assets/2fa955d5-db79-494c-b6ca-41d8f3af4ec2" />
+
 
 3. Показать структуру узла
 
